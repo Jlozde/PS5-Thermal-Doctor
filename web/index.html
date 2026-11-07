@@ -198,6 +198,9 @@ const I18N = {
   }
 };
 function pickLang(){
+  // order: ?lang= in the address, the saved choice, then the browser language
+  const q = new URLSearchParams(location.search).get('lang');
+  if(q==='en'||q==='tr') return q;
   try{ const s = localStorage.getItem('ps5td.lang'); if(s==='en'||s==='tr') return s; }catch(e){}
   const langs = navigator.languages || [navigator.language || 'en'];
   return langs.some(l => String(l).toLowerCase().startsWith('tr')) ? 'tr' : 'en';

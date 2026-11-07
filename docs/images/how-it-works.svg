@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="444" viewBox="0 0 1200 444" role="img" aria-label="How PS5 Thermal Doctor decides">
+<title>How PS5 Thermal Doctor decides</title>
+<rect width="1200" height="444" rx="16" fill="#0e1116"/>
+<text x="24" y="44" font-size="21" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700">How PS5 Thermal Doctor decides</text>
+<text x="24" y="68" font-size="13.5" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Fan, temperature and power are read together, because a PS5 hides dust by spinning its fan faster.</text>
+<rect x="24" y="92" width="246" height="330" rx="12" fill="#171b22" stroke="#2a3240"/>
+<rect x="36" y="92" width="222" height="3" fill="#4ea1ff"/>
+<text x="42" y="122" font-size="11" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="600" letter-spacing="1.2">STEP 1</text>
+<text x="42" y="146" font-size="16.5" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700">Measure every second</text>
+<path d="M282 257.0 H312" stroke="#4ea1ff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M304 250.0 L313 257.0 L304 264.0" fill="none" stroke="#4ea1ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="326" y="92" width="246" height="330" rx="12" fill="#171b22" stroke="#2a3240"/>
+<rect x="338" y="92" width="222" height="3" fill="#4ea1ff"/>
+<text x="344" y="122" font-size="11" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="600" letter-spacing="1.2">STEP 2</text>
+<text x="344" y="146" font-size="16.5" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700">Summarise each session</text>
+<path d="M584 257.0 H614" stroke="#4ea1ff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M606 250.0 L615 257.0 L606 264.0" fill="none" stroke="#4ea1ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="628" y="92" width="246" height="330" rx="12" fill="#171b22" stroke="#2a3240"/>
+<rect x="640" y="92" width="222" height="3" fill="#4ea1ff"/>
+<text x="646" y="122" font-size="11" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="600" letter-spacing="1.2">STEP 3</text>
+<text x="646" y="146" font-size="16.5" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700">Run three checks</text>
+<path d="M886 257.0 H916" stroke="#4ea1ff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M908 250.0 L917 257.0 L908 264.0" fill="none" stroke="#4ea1ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="930" y="92" width="246" height="330" rx="12" fill="#171b22" stroke="#2a3240"/>
+<rect x="942.0" y="92" width="55.5" height="3" fill="#2ecc71"/>
+<rect x="997.5" y="92" width="55.5" height="3" fill="#f1c40f"/>
+<rect x="1053.0" y="92" width="55.5" height="3" fill="#e67e22"/>
+<rect x="1108.5" y="92" width="55.5" height="3" fill="#e74c3c"/>
+<text x="948" y="122" font-size="11" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="600" letter-spacing="1.2">STEP 4</text>
+<text x="948" y="146" font-size="16.5" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700">Get a verdict</text>
+<circle cx="48" cy="179.5" r="5" fill="#ff6b6b"/>
+<text x="62" y="184" font-size="13.5" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">SoC + CPU temperature</text>
+<circle cx="48" cy="213.5" r="5" fill="#4ea1ff"/>
+<text x="62" y="218" font-size="13.5" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Fan speed</text>
+<circle cx="48" cy="247.5" r="5" fill="#b388ff"/>
+<text x="62" y="252" font-size="13.5" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Power draw (GPU rail)</text>
+<circle cx="48" cy="281.5" r="5" fill="#2ecc71"/>
+<text x="62" y="286" font-size="13.5" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">FPS (display flips)</text>
+<circle cx="48" cy="315.5" r="5" fill="#ffb347"/>
+<text x="62" y="320" font-size="13.5" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Running game</text>
+<text x="42" y="382" font-size="12" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Read-only: nothing on the</text>
+<text x="42" y="399" font-size="12" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">console is changed.</text>
+<text x="344" y="182" font-size="13" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">· Skip the 10 min warm-up</text>
+<text x="344" y="206" font-size="13" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">· Average the steady state</text>
+<text x="344" y="240" font-size="12" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Cooling demand index</text>
+<rect x="344" y="250" width="210" height="84" rx="8" fill="#0e1116" stroke="#2a3240"/>
+<text x="356" y="275" font-size="12.5" fill="#cfe3ff" font-family="ui-monospace,SFMono-Regular,Consolas,'Liberation Mono',monospace" xml:space="preserve">CDI = T_soc</text>
+<text x="356" y="298" font-size="12.5" fill="#e6e9ef" font-family="ui-monospace,SFMono-Regular,Consolas,'Liberation Mono',monospace" xml:space="preserve">  + 0.30 · (fan% − 40)</text>
+<text x="356" y="321" font-size="12.5" fill="#e6e9ef" font-family="ui-monospace,SFMono-Regular,Consolas,'Liberation Mono',monospace" xml:space="preserve">  − 0.25 · (W − 150)</text>
+<text x="344" y="382" font-size="12" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Higher CDI: the cooling works</text>
+<text x="344" y="399" font-size="12" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">harder for the same load.</text>
+<rect x="646" y="164" width="210" height="60" rx="8" fill="#0e1116" stroke="#2a3240"/>
+<text x="658" y="185" font-size="13" fill="#4ea1ff" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700">Absolute</text>
+<text x="658" y="202" font-size="12" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Fan is high and the SoC</text>
+<text x="658" y="217" font-size="12" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">is still hot</text>
+<rect x="646" y="234" width="210" height="60" rx="8" fill="#0e1116" stroke="#2a3240"/>
+<text x="658" y="255" font-size="13" fill="#4ea1ff" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700">Baseline</text>
+<text x="658" y="272" font-size="12" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">CDI vs. this console's</text>
+<text x="658" y="287" font-size="12" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">first 5 sessions</text>
+<rect x="646" y="304" width="210" height="60" rx="8" fill="#0e1116" stroke="#2a3240"/>
+<text x="658" y="325" font-size="13" fill="#4ea1ff" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700">Trend</text>
+<text x="658" y="342" font-size="12" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">CDI slope over time,</text>
+<text x="658" y="357" font-size="12" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">°C per 30 days</text>
+<text x="646" y="399" font-size="12" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">The worst result wins.</text>
+<rect x="948" y="170" width="88" height="26" rx="6" fill="#2ecc71"/>
+<text x="992" y="187.5" font-size="11.5" fill="#000000" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700" text-anchor="middle" letter-spacing="0.4">OK</text>
+<text x="1046" y="187.5" font-size="13" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Cooling is normal</text>
+<rect x="948" y="216" width="88" height="26" rx="6" fill="#f1c40f"/>
+<text x="992" y="233.5" font-size="11.5" fill="#000000" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700" text-anchor="middle" letter-spacing="0.4">WATCH</text>
+<text x="1046" y="233.5" font-size="13" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Keep an eye on it</text>
+<rect x="948" y="262" width="88" height="26" rx="6" fill="#e67e22"/>
+<text x="992" y="279.5" font-size="11.5" fill="#000000" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700" text-anchor="middle" letter-spacing="0.4">CLEAN</text>
+<text x="1046" y="279.5" font-size="13" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Clean the dust</text>
+<rect x="948" y="308" width="88" height="26" rx="6" fill="#e74c3c"/>
+<text x="992" y="325.5" font-size="11.5" fill="#ffffff" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-weight="700" text-anchor="middle" letter-spacing="0.4">SERVICE</text>
+<text x="1046" y="325.5" font-size="13" fill="#e6e9ef" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Get it serviced</text>
+<text x="948" y="382" font-size="12" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">PS5 notification</text>
+<text x="948" y="399" font-size="12" fill="#8b94a3" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">+ web UI on port 8088</text>
+</svg>

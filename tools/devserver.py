@@ -70,6 +70,23 @@ def verdict_abs(soc, fan):
     return 0
 
 
+def abs_reason(lang, soc, fan, pw):
+    """Same wording as an_verdict_abs() in src/analysis.c."""
+    v = verdict_abs(soc, fan)
+    f = pct(lang, fan)
+    if v == 3:
+        return L(lang, f"Fan at {f} and SoC still {soc:.0f}°C: cooling is insufficient.",
+                       f"Fan {f}'de çalışırken SoC {soc:.0f}°C: soğutma yetersiz.")
+    if v == 2:
+        return L(lang, f"Fan {f} and SoC {soc:.0f}°C: the fan struggles to hold the temperature at high speed.",
+                       f"Fan {f} ve SoC {soc:.0f}°C: fan yüksek devirde sıcaklığı zor tutuyor.")
+    if v == 1:
+        return L(lang, f"Fan {f} and SoC {soc:.0f}°C: slightly above normal.",
+                       f"Fan {f} ve SoC {soc:.0f}°C: normalin biraz üstünde.")
+    return L(lang, f"SoC {soc:.0f}°C, fan {f}, {pw:.0f} W: values are in the normal range.",
+                   f"SoC {soc:.0f}°C, fan {f}, {pw:.0f} W: değerler normal aralıkta.")
+
+
 NAMES = {-1: "NO_DATA", 0: "OK", 1: "WATCH", 2: "CLEAN", 3: "SERVICE"}
 BADGE = {"en": {-1: "NO DATA", 0: "OK", 1: "WATCH", 2: "CLEAN", 3: "SERVICE"},
          "tr": {-1: "VERİ YOK", 0: "OK", 1: "İZLE", 2: "TEMİZLİK", 3: "SERVİS"}}
@@ -132,8 +149,7 @@ def overall(lang):
         slope = (n * sxy - sx * sy) / (n * sxx - sx * sx) * 30
         if slope >= 2 and v < 1: v = 1
     if last:
-        reason_abs = L(lang, f"SoC {last['ss_soc']:.0f}°C, fan {pct(lang, last['ss_fan'])}, {last['ss_power']:.0f} W: values are in the normal range.",
-                             f"SoC {last['ss_soc']:.0f}°C, fan {pct(lang, last['ss_fan'])}, {last['ss_power']:.0f} W: değerler normal aralıkta.")
+        reason_abs = abs_reason(lang, last['ss_soc'], last['ss_fan'], last['ss_power'])
     else:
         reason_abs = L(lang, "No recorded session yet.", "Henüz kayıtlı oturum yok.")
     if bv:
@@ -206,8 +222,7 @@ def live_summary(lang):
     pw = sum(s["power_w"] for s in ss) / len(ss) if ss else -1
     v = verdict_abs(soc, fan) if valid else -1
     if valid:
-        reason = L(lang, f"SoC {soc:.0f}°C, fan {pct(lang, fan)}, {pw:.0f} W: values are in the normal range.",
-                         f"SoC {soc:.0f}°C, fan {pct(lang, fan)}, {pw:.0f} W: değerler normal aralıkta.")
+        reason = abs_reason(lang, soc, fan, pw)
     else:
         need = (CFG["warmup_s"] + CFG["min_ss_s"] + 59) // 60
         reason = L(lang, f"Not enough steady-state data: at least {need} min of continuous play is needed.",

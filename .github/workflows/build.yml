@@ -1,38 +1,72 @@
 # Builds the ELF on GitHub Actions, so you get a ready payload without installing Linux/WSL.
 # ELF'i GitHub Actions'ta derler; Linux/WSL kurmadan hazır payload almak için.
 # Result / sonuç: Actions -> the run -> Artifacts -> ps5-thermal-doctor
+#
+# Pushing a tag like v0.2.0 also publishes a GitHub Release with the ELF, SHA256SUMS.txt and
+# the notes in .github/release-notes/<tag>.md. The tag must match PS5TD_VERSION in src/ps5td.h.
+# v0.2.0 gibi bir etiket gönderilince ELF, SHA256SUMS.txt ve .github/release-notes/<etiket>.md
+# notlarıyla bir GitHub Release de yayınlanır. Etiket src/ps5td.h içindeki PS5TD_VERSION ile aynı olmalı.
 name: Build PS5 payload
 
 on:
   push:
     branches: [main, master]
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
+env:
+  SDK_VERSION: v0.45
+
 jobs:
   host-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Diagnosis tests (gcc)
         run: make test HOST_CC=gcc
 
   build-elf:
+    needs: host-tests
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Tools
-        run: sudo apt-get update && sudo apt-get install -y bash clang-18 lld-18 wget unzip python3
-      - name: ps5-payload-sdk (release build)
+        run: sudo apt-get update && sudo apt-get install -y bash clang-18 lld-18 llvm-18 wget unzip python3
+      - name: ps5-payload-sdk ${{ env.SDK_VERSION }}
         run: |
-          wget -q https://github.com/ps5-payload-dev/sdk/releases/latest/download/ps5-payload-sdk.zip
+          wget -q "https://github.com/ps5-payload-dev/sdk/releases/download/${SDK_VERSION}/ps5-payload-sdk.zip"
           sudo unzip -q -d /opt ps5-payload-sdk.zip
           ls /opt/ps5-payload-sdk
       - name: Build
         env:
           PS5_PAYLOAD_SDK: /opt/ps5-payload-sdk
         run: make
-      - uses: actions/upload-artifact@v4
+      - name: Checksum
+        run: sha256sum ps5-thermal-doctor.elf | tee SHA256SUMS.txt
+      - uses: actions/upload-artifact@v7
         with:
           name: ps5-thermal-doctor
-          path: ps5-thermal-doctor.elf
+          path: |
+            ps5-thermal-doctor.elf
+            SHA256SUMS.txt
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          ver="$(grep -oP '#define\s+PS5TD_VERSION\s+"\K[^"]+' src/ps5td.h)"
+          if [ "v$ver" != "$TAG" ]; then
+            echo "::error::Tag $TAG does not match PS5TD_VERSION $ver"
+            exit 1
+          fi
+          notes=".github/release-notes/$TAG.md"
+          if [ ! -f "$notes" ]; then
+            echo "::error::Missing release notes: $notes"
+            exit 1
+          fi
+          gh release create "$TAG" ps5-thermal-doctor.elf SHA256SUMS.txt \
+            --title "PS5 Thermal Doctor $ver" --notes-file "$notes" --verify-tag

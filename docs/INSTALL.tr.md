@@ -2,7 +2,9 @@
 
 [English](INSTALL.md) · **Türkçe**
 
-ELF'i üç yoldan edinebilirsiniz. Windows'ta en pratiği **A**'dır: iki zip açılır, yönetici hakkı ve WSL gerekmez.
+En hızlı yol, hazır `ps5-thermal-doctor.elf` dosyasını [Releases](https://github.com/Jlozde/PS5-Thermal-Doctor/releases/latest) sayfasından indirip doğrudan [PS5'e gönderme](#ps5e-gönderme) adımına geçmektir.
+
+Kendiniz derlemek için üç yol var. Windows'ta en pratiği **A**'dır: iki zip açılır, yönetici hakkı ve WSL gerekmez.
 
 ## A) Windows, WSL'siz (`tools\build.ps1`)
 
@@ -26,13 +28,14 @@ powershell -ExecutionPolicy Bypass -File .\tools\build.ps1        # -> ps5-therm
 - `-ShowCommands` çalıştırılan komutları gösterir. `-NoStrip` sembolleri bırakır; ayrı dosya için `-Out build\debug.elf` ile birlikte kullanın.
 - Betik Makefile ile aynı bayrakları ve SDK'nın `bin/prospero-clang` sarmalayıcısının mantığını kullanır. clang 20+ ile crt nesnelerini sürücü kendisi ekler (`SCE_PROSPERO_SDK_DIR`).
 - Proje ağ paylaşımındaysa (`\\sunucu\...`) PowerShell imzasız betikleri "not digitally signed" diye engeller. Bu yüzden `powershell -ExecutionPolicy Bypass -File ...` biçimi kullanılır. Kalıcı çözüm `Set-ExecutionPolicy -Scope CurrentUser Bypass`'tır; bu güvenlik tercihi size aittir.
-- Denenen bileşim: SDK v0.45 (2025-10-21) + llvm-mingw 20261104 (clang 23.1.5), sonuç ~165 KB ELF.
+- Denenen bileşim: SDK v0.45 (2026-10-21) + llvm-mingw 20261104 (clang 23.1.5), sonuç ~165 KB ELF.
 
 ## B) GitHub Actions
 
 1. Bu klasörü bir GitHub deposuna gönderin.
 2. Actions sekmesinde "Build PS5 payload" iş akışı çalışır. Bitince `ps5-thermal-doctor.elf` dosyasını **Artifacts → ps5-thermal-doctor** içinden indirin.
 3. İş akışı ayrıca PC testlerini de çalıştırır (`make test`).
+4. `v0.2.0` gibi bir etiket gönderildiğinde ELF, `SHA256SUMS.txt` ve `.github/release-notes/<etiket>.md` notlarıyla bir GitHub Release yayınlanır. Etiket `src/ps5td.h` içindeki `PS5TD_VERSION` ile aynı olmalıdır.
 
 ## C) WSL (Windows) veya Linux
 

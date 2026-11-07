@@ -2,7 +2,9 @@
 
 **English** · [Türkçe](INSTALL.tr.md)
 
-There are three ways to get the ELF. On Windows the easiest is **A**: unpack two zip files, no admin rights and no WSL needed.
+The quickest way is to download a ready `ps5-thermal-doctor.elf` from the [Releases](https://github.com/Jlozde/PS5-Thermal-Doctor/releases/latest) page and skip to [Sending to the PS5](#sending-to-the-ps5).
+
+To build it yourself there are three ways. On Windows the easiest is **A**: unpack two zip files, no admin rights and no WSL needed.
 
 ## A) Windows without WSL (`tools\build.ps1`)
 
@@ -26,13 +28,14 @@ powershell -ExecutionPolicy Bypass -File .\tools\build.ps1        # -> ps5-therm
 - `-ShowCommands` prints the commands it runs. `-NoStrip` keeps the symbols; combine it with `-Out build\debug.elf` to write a separate file.
 - The script uses the same flags as the Makefile and the logic of the SDK's `bin/prospero-clang` wrapper. With clang 20+ the driver adds the crt objects itself (`SCE_PROSPERO_SDK_DIR`).
 - If the project is on a network share (`\\server\...`), PowerShell blocks unsigned scripts with "not digitally signed". That is why the `powershell -ExecutionPolicy Bypass -File ...` form is used. A permanent fix is `Set-ExecutionPolicy -Scope CurrentUser Bypass`; that security choice is yours.
-- Tested combination: SDK v0.45 (2025-10-21) + llvm-mingw 20261104 (clang 23.1.5), giving a ~165 KB ELF.
+- Tested combination: SDK v0.45 (2026-10-21) + llvm-mingw 20261104 (clang 23.1.5), giving a ~165 KB ELF.
 
 ## B) GitHub Actions
 
 1. Push this folder to a GitHub repository.
 2. The "Build PS5 payload" workflow runs in the Actions tab. When it finishes, download `ps5-thermal-doctor.elf` from **Artifacts → ps5-thermal-doctor**.
 3. The workflow also runs the PC tests (`make test`).
+4. Pushing a tag such as `v0.2.0` publishes a GitHub Release with the ELF, `SHA256SUMS.txt` and the notes from `.github/release-notes/<tag>.md`. The tag must match `PS5TD_VERSION` in `src/ps5td.h`.
 
 ## C) WSL (Windows) or Linux
 

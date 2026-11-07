@@ -2,11 +2,51 @@
 
 **English** · [Türkçe](README.tr.md)
 
-A background payload for jailbroken PS5 consoles. While you play, it records **temperature, fan speed, power draw and FPS**. When the game closes it answers **"does this console need maintenance?"** and shows the result as a PS5 notification. A web UI, opened from a phone or PC, shows live charts, the session history and the long-term trend.
+### Know when your PS5 needs cleaning, before it overheats.
+
+PS5 Thermal Doctor is a background payload for jailbroken PS5 consoles. While you play, it watches how hard the cooling system has to work. It compares every session with your console's own history, and when the game closes it tells you plainly: **cooling is fine**, **keep an eye on it**, **clean the dust** or **get it serviced**.
+
+![A healthy console: OK, cooling is normal](docs/images/verdict-healthy.png)
+
+![A dusty console: SERVICE, cooling insufficient](docs/images/verdict-dusty.png)
+
+<sub>Top: a healthy console. Bottom: a console whose heatsink is clogged with dust. Screenshots from the built-in simulator.</sub>
+
+**[Download the latest release](https://github.com/Jlozde/PS5-Thermal-Doctor/releases/latest)** · [Install guide](docs/INSTALL.md) · [How the verdict works](docs/ANALYSIS.md) · [Changelog](CHANGELOG.md)
 
 > **Note:** It does not run on a normal (non-jailbroken) PS5. It needs firmware 4.03–14.10 and the etaHEN / elfldr loader.
 
-Everything a user sees is available in **English and Turkish**: the web UI, PS5 notifications, the log, `config.ini` comments, API texts, tool output and these documents. See [Language](#language).
+## Why
+
+Dust builds up slowly, over months. A PS5 does not warn you about it: its fan controller simply spins the fan faster to keep the chip at the same temperature. The temperature therefore looks fine for a long time, until the console gets loud, the fan runs flat out and the console finally shuts down to protect itself.
+
+Looking at the temperature alone cannot catch this. PS5 Thermal Doctor reads **fan speed, temperature and power together** and works out how much cooling effort the console needs for the same load. When that effort creeps up compared with the console's own baseline, it tells you to clean it, long before it overheats.
+
+- **Read-only.** No overlay, no fan control, no tuning. It reads sensors and never changes anything on the console.
+- **Results where you look.** A PS5 notification when the game closes, and a web UI on your phone or PC.
+- **English and Turkish.** Every text a user sees is available in both languages.
+
+## How it works
+
+![How PS5 Thermal Doctor decides](docs/images/how-it-works.svg)
+
+1. **Absolute rules**, from the first session: if the fan is high **and** the temperature is still high, cooling is insufficient.
+   Default thresholds: WATCH 60% / 76 °C · CLEAN 70% / 80 °C · SERVICE 85% / 86 °C.
+2. **Comparison with a baseline**: the first 5 sessions form the baseline. Each session gets a *cooling demand index*:
+   `CDI = T_soc + 0.30·(fan% − 40) − 0.25·(W − 150)`. A console that does the same work hotter and with a faster fan gets a higher CDI. Against the baseline, +4 °C is WATCH, +8 °C is CLEAN and +14 °C is SERVICE.
+3. **Trend**: with 6+ sessions over 14+ days, the monthly slope of the CDI is computed. +2 °C per month or more raises a warning.
+
+After cleaning, the **"New baseline"** button in the web UI resets the comparison. Details: [docs/ANALYSIS.md](docs/ANALYSIS.md).
+
+## What you see
+
+![Web UI during a game](docs/images/dashboard.png)
+
+<sub>The web UI during a game: overall verdict, live sensor values, an interim summary every 30 s, and live temperature, fan, power and FPS charts.</sub>
+
+![Session history of a console getting dustier](docs/images/history-dusty.png)
+
+<sub>Session history of a console getting dustier over two months. The cooling demand index climbs through the watch, clean and service lines.</sub>
 
 ## What it reads
 
@@ -19,23 +59,9 @@ Everything a user sees is available in **English and Turkish**: the web UI, PS5 
 | Running game | `sceSystemServiceGetAppIdOfRunningBigApp` + `/mnt/sandbox/pfsmnt` |
 | System language | `sceSystemServiceParamGetInt` (for `lang = auto`) |
 
-It **changes nothing**: it never writes the fan threshold and never injects into the game process. It only reads.
-
-## How the verdict is made (short)
-
-1. **Absolute rules**, from the first session: if the fan is high **and** the temperature is still high, cooling is insufficient.
-   Default thresholds: WATCH 60% / 76 °C · CLEAN 70% / 80 °C · SERVICE 85% / 86 °C.
-2. **Comparison with a baseline**: the first 5 sessions form the baseline. Each session gets a *cooling demand index*:
-   `CDI = T_soc + 0.30·(fan% − 40) − 0.25·(W − 150)`. A console that does the same work hotter and with a faster fan gets a higher CDI. Against the baseline, +4 °C is WATCH, +8 °C is CLEAN and +14 °C is SERVICE.
-3. **Trend**: with 6+ sessions over 14+ days, the monthly slope of the CDI is computed. +2 °C per month or more raises a warning.
-
-After cleaning, the **"New baseline"** button in the web UI resets the comparison. Details: [docs/ANALYSIS.md](docs/ANALYSIS.md).
-
-Verdict levels: **OK** → **WATCH** → **CLEAN** (dust cleaning) → **SERVICE** (cleaning plus a service check of the thermal interface / liquid metal).
-
 ## Setup
 
-1. Get the ELF: on Windows run `powershell -ExecutionPolicy Bypass -File .\tools\build.ps1` (SDK + portable clang, no WSL needed), use the [GitHub Actions artifact](.github/workflows/build.yml), or run `make` under Linux/WSL. See [docs/INSTALL.md](docs/INSTALL.md).
+1. Download `ps5-thermal-doctor.elf` from the [latest release](https://github.com/Jlozde/PS5-Thermal-Doctor/releases/latest). To build it yourself, see [docs/INSTALL.md](docs/INSTALL.md).
 2. Make sure the PS5 is jailbroken and etaHEN (or elfldr) is running.
 3. Send the payload:
    ```powershell
@@ -51,7 +77,7 @@ The payload has to be sent again after every console restart. etaHEN can start i
 
 | Where | How the language is chosen |
 |---|---|
-| Web UI | The **EN / TR** buttons in the header. The first visit follows the browser language; the choice is remembered in the browser. |
+| Web UI | The **EN / TR** buttons in the header, or `?lang=en` / `?lang=tr` in the address. The first visit follows the browser language; the choice is remembered in the browser. |
 | PS5 notifications, log file, payload output | The `lang` key in `config.ini`: `auto` (PS5 system language, Turkish → Turkish, anything else → English), `en` or `tr`. |
 | JSON API | `?lang=en` or `?lang=tr` on `/api/status` and `/api/log`. Without it, the console language is used. |
 | `config.ini` | Every key has a comment line in both languages. |
@@ -82,6 +108,7 @@ tools/build.ps1      Windows build without WSL
 tools/send_payload.ps1   sends the ELF to elfldr
 tools/devserver.py   fake server for trying the UI on a PC
 test/                PC tests and syntax check (test\host-check.ps1)
+docs/                install guide, diagnosis logic, README images
 ```
 
 ## Development
@@ -93,13 +120,7 @@ $env:PS5TD_SIM="dusty"; python tools\devserver.py                 # dusty consol
 $env:PS5TD_LANG="tr"; python tools\devserver.py                   # simulate a Turkish console
 ```
 
-On Linux: `make test`.
-
-## Changes in 0.2.0
-
-- Bilingual (English / Turkish) UI, notifications, log, config and API (`lang` setting, `?lang=`).
-- The CPU power rail is counted as live only when it really goes up and down; on FW 11.60 it is a peak-hold counter and used to inflate the total power.
-- Fixed live charts growing taller on every redraw on HiDPI screens.
+On Linux: `make test`. Pushing a `v*` tag publishes a release through GitHub Actions; see [docs/INSTALL.md](docs/INSTALL.md#b-github-actions).
 
 ## Credits / sources
 
