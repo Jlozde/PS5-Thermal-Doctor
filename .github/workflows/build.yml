@@ -1,0 +1,38 @@
+# Builds the ELF on GitHub Actions, so you get a ready payload without installing Linux/WSL.
+# ELF'i GitHub Actions'ta derler; Linux/WSL kurmadan hazır payload almak için.
+# Result / sonuç: Actions -> the run -> Artifacts -> ps5-thermal-doctor
+name: Build PS5 payload
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  host-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Diagnosis tests (gcc)
+        run: make test HOST_CC=gcc
+
+  build-elf:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: sudo apt-get update && sudo apt-get install -y bash clang-18 lld-18 wget unzip python3
+      - name: ps5-payload-sdk (release build)
+        run: |
+          wget -q https://github.com/ps5-payload-dev/sdk/releases/latest/download/ps5-payload-sdk.zip
+          sudo unzip -q -d /opt ps5-payload-sdk.zip
+          ls /opt/ps5-payload-sdk
+      - name: Build
+        env:
+          PS5_PAYLOAD_SDK: /opt/ps5-payload-sdk
+        run: make
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ps5-thermal-doctor
+          path: ps5-thermal-doctor.elf
