@@ -77,8 +77,13 @@ If the payload is sent a second time, the old instance is stopped automatically:
 ## Language
 
 - Web UI: the **EN / TR** buttons in the header.
-- Notifications, log and payload output: `lang = auto | en | tr` in `/data/ps5td/config.ini`, also editable in the web UI under "Maintenance and settings". `auto` follows the PS5 system language.
+- Notifications, log and payload output: `lang = auto | en | tr` in `/data/ps5td/config.ini`, also editable in the Settings tab of the web UI. `auto` follows the PS5 system language.
 - The startup log prints the chosen language, for example `Language: en (config auto, PS5 system language code 1).`
+
+## Temperature unit
+
+- Celsius by default. Choose Fahrenheit in the Settings tab, or set `temp_unit = f` in `config.ini`.
+- The unit changes the web UI and the PS5 notifications. The log and the thresholds in `config.ini` always stay in °C; the Settings tab converts them for display.
 
 ## Auto-start (etaHEN)
 

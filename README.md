@@ -32,6 +32,7 @@ Looking at the temperature alone cannot catch this. PS5 Thermal Doctor reads **f
 - **Read-only.** No overlay, no fan control, no tuning. It reads sensors and never changes anything on the console.
 - **Results where you look.** A PS5 notification when the game closes, and a web UI on your phone or PC.
 - **English and Turkish.** Every text a user sees is available in both languages.
+- **°C or °F.** Celsius by default; Fahrenheit can be chosen in the Settings tab.
 
 ## How it works
 
@@ -43,7 +44,7 @@ Looking at the temperature alone cannot catch this. PS5 Thermal Doctor reads **f
    `CDI = T_soc + 0.30·(fan% − 40) − 0.25·(W − 150)`. A console that does the same work hotter and with a faster fan gets a higher CDI. Against the baseline, +4 °C is WATCH, +8 °C is CLEAN and +14 °C is SERVICE.
 3. **Trend**: with 6+ sessions over 14+ days, the monthly slope of the CDI is computed. +2 °C per month or more raises a warning.
 
-After cleaning, the **"New baseline"** button in the web UI resets the comparison. Details: [docs/ANALYSIS.md](docs/ANALYSIS.md).
+After cleaning, the **"New baseline"** button in the Settings tab of the web UI resets the comparison. Details: [docs/ANALYSIS.md](docs/ANALYSIS.md).
 
 ## What you see
 
@@ -54,6 +55,10 @@ After cleaning, the **"New baseline"** button in the web UI resets the compariso
 ![Session history of a console getting dustier](docs/images/history-dusty.png)
 
 <sub>Session history of a console getting dustier over two months. The cooling demand index climbs through the watch, clean and service lines.</sub>
+
+![Settings tab](docs/images/settings.png)
+
+<sub>The Settings tab: console language, temperature unit, notifications, measurement and every verdict threshold, each with a short explanation. Temperatures are shown in °C by default and can be switched to °F.</sub>
 
 ## What it reads
 
@@ -85,16 +90,16 @@ The payload has to be sent again after every console restart. etaHEN can start i
 | Where | How the language is chosen |
 |---|---|
 | Web UI | The **EN / TR** buttons in the header, or `?lang=en` / `?lang=tr` in the address. The first visit follows the browser language; the choice is remembered in the browser. |
-| PS5 notifications, log file, payload output | The `lang` key in `config.ini`: `auto` (PS5 system language, Turkish → Turkish, anything else → English), `en` or `tr`. |
+| PS5 notifications, log file, payload output | **Console language** in the Settings tab (the `lang` key in `config.ini`): `auto` (PS5 system language, Turkish → Turkish, anything else → English), `en` or `tr`. |
 | JSON API | `?lang=en` or `?lang=tr` on `/api/status` and `/api/log`. Without it, the console language is used. |
-| `config.ini` | Every key has a comment line in both languages. |
+| `config.ini` | Every key has a comment line in both languages. The Settings tab edits the same keys. |
 
 The in-memory log keeps every line in both languages, so switching the web UI language also switches the log view.
 
 ## Files on the console
 
 ```
-/data/ps5td/config.ini      settings (editable from the web UI)
+/data/ps5td/config.ini      settings (edited in the Settings tab of the web UI)
 /data/ps5td/history.csv     session summaries
 /data/ps5td/sessions/*.csv  raw data per session, every 5 s
 /data/ps5td/state.ini       baseline counter

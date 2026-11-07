@@ -175,6 +175,28 @@ test_i18n(const config_t *c) {
   CHECK(strstr(en, "%,") != NULL && strstr(en, "normal range") != NULL, "EN reason: number then %% (%s)", en);
   CHECK(strstr(tr, "fan %") != NULL && strstr(tr, "normal aralıkta") != NULL, "TR reason: %% then number (%s)", tr);
 
+  /* Temperature unit: values stay in °C, texts follow temp_unit */
+  CHECK(i18n_parse_unit("c") == TEMP_C && i18n_parse_unit("F") == TEMP_F && i18n_parse_unit("Fahrenheit") == TEMP_F &&
+        i18n_parse_unit("k") == -1 && i18n_parse_unit(NULL) == -1, "temperature unit codes parse");
+  CHECK(fabs(i18n_temp(100.0, TEMP_F) - 212.0) < 1e-9 && fabs(i18n_temp(0.0, TEMP_F) - 32.0) < 1e-9 &&
+        fabs(i18n_temp(72.0, TEMP_C) - 72.0) < 1e-9, "absolute conversion C -> F");
+  CHECK(fabs(i18n_tdelta(10.0, TEMP_F) - 18.0) < 1e-9 && fabs(i18n_tdelta(10.0, TEMP_C) - 10.0) < 1e-9,
+        "difference conversion C -> F (no +32)");
+  CHECK(strcmp(i18n_unit_sym(TEMP_F), "°F") == 0 && strcmp(i18n_unit_code(TEMP_F), "f") == 0 &&
+        strcmp(i18n_unit_sym(TEMP_C), "°C") == 0, "unit symbols and codes");
+  config_t cf = *c;
+  cf.temp_unit = TEMP_F;
+  char fen[AN_REASON_LEN], ftr[AN_REASON_LEN];
+  int vf = an_verdict_abs(&h, &cf, LANG_EN, fen, sizeof(fen));
+  an_verdict_abs(&h, &cf, LANG_TR, ftr, sizeof(ftr));
+  CHECK(vf == VERDICT_OK && strstr(fen, "°F") != NULL && strstr(fen, "°C") == NULL && strstr(ftr, "°F") != NULL,
+        "reason texts use °F when asked (%s)", fen);
+  char want[32];
+  snprintf(want, sizeof(want), "SoC %.0f°F", i18n_temp(h.ss_soc, TEMP_F));
+  CHECK(strstr(fen, want) != NULL, "SoC %.1f °C is shown as \"%s\" (%s)", (double)h.ss_soc, want, fen);
+  session_summary_t hot = run_session(&cf, 1700000000000ULL, 1800, 88, 92, 170, 60, 0, "PPSA00002");
+  CHECK(hot.verdict == VERDICT_SERVICE, "the verdict does not depend on the display unit (%s)", an_verdict_name(hot.verdict));
+
   /* The active console language switches LNG() */
   i18n_set(LANG_TR);
   CHECK(strcmp(LNG("yes", "evet"), "evet") == 0, "LNG follows the console language (tr)");
@@ -209,7 +231,8 @@ test_persistence(const config_t *c) {
   config_t a, b;
   config_defaults(&a);
   CHECK(a.lang == LANG_AUTO, "default language is auto");
-  a.http_port = 9090; a.k_fan = 0.45f; a.baseline_sessions = 7; a.lang = LANG_TR;
+  CHECK(a.temp_unit == TEMP_C, "default temperature unit is Celsius");
+  a.http_port = 9090; a.k_fan = 0.45f; a.baseline_sessions = 7; a.lang = LANG_TR; a.temp_unit = TEMP_F;
   char txt[8192];
   size_t len = config_to_text(&a, txt, sizeof(txt));
   CHECK(len < sizeof(txt) - 1, "config text fits (%u bytes)", (unsigned)len);
@@ -219,8 +242,12 @@ test_persistence(const config_t *c) {
   int bad = config_apply_text(&b, txt);
   CHECK(bad == 0, "the text applies without errors (%d)", bad);
   CHECK(b.http_port == 9090 && fabs(b.k_fan - 0.45f) < 0.001 && b.baseline_sessions == 7 && b.lang == LANG_TR, "config round trip");
-  bad = config_apply_text(&b, "http_port = 99999\nunknown = 1\nk_pow = abc\nlang = xx\n");
-  CHECK(bad == 3 && b.http_port == 65535 && b.lang == LANG_TR, "bad lines are counted, values clamped (bad=%d port=%u)", bad, b.http_port);
+  CHECK(strstr(txt, "temp_unit = f") != NULL && b.temp_unit == TEMP_F, "temp_unit round trip");
+  bad = config_apply_text(&b, "http_port = 99999\nunknown = 1\nk_pow = abc\nlang = xx\ntemp_unit = kelvin\n");
+  CHECK(bad == 4 && b.http_port == 65535 && b.lang == LANG_TR && b.temp_unit == TEMP_F,
+        "bad lines are counted, values clamped (bad=%d port=%u)", bad, b.http_port);
+  bad = config_apply_text(&b, "temp_unit = C\n");
+  CHECK(bad == 0 && b.temp_unit == TEMP_C, "temp_unit = C");
   bad = config_apply_text(&b, "lang = auto\n");
   CHECK(bad == 0 && b.lang == LANG_AUTO, "lang = auto");
 

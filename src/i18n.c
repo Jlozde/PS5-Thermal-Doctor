@@ -43,3 +43,31 @@ i18n_code(int lang) {
     default:      return "auto";
   }
 }
+
+int
+i18n_parse_unit(const char *s) {
+  if(!s) return -1;
+  if(ieq(s, "c") || ieq(s, "celsius")) return TEMP_C;
+  if(ieq(s, "f") || ieq(s, "fahrenheit")) return TEMP_F;
+  return -1;
+}
+
+const char *
+i18n_unit_code(int unit) {
+  return unit == TEMP_F ? "f" : "c";
+}
+
+const char *
+i18n_unit_sym(int unit) {
+  return unit == TEMP_F ? "°F" : "°C";
+}
+
+double
+i18n_temp(double c, int unit) {
+  return unit == TEMP_F ? c * 1.8 + 32.0 : c;
+}
+
+double
+i18n_tdelta(double c, int unit) {
+  return unit == TEMP_F ? c * 1.8 : c;
+}

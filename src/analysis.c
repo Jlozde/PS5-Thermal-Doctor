@@ -111,7 +111,11 @@ add_reason(char *why, size_t n, const char *txt) {
   snprintf(why + used, n - used, "%s", txt);
 }
 
-/* Turkish writes the percent sign before the number ("%38"), English after ("38%"). */
+/* Turkish writes the percent sign before the number ("%38"), English after ("38%").
+   Temperatures in texts follow config "temp_unit"; the comparisons stay in °C. */
+static double tc(const config_t *c, double v) { return i18n_temp(v, c->temp_unit); }
+static double td(const config_t *c, double v) { return i18n_tdelta(v, c->temp_unit); }
+static const char *tsym(const config_t *c) { return i18n_unit_sym(c->temp_unit); }
 
 int
 an_verdict_abs(const session_summary_t *s, const config_t *c, int lang, char *why, size_t n) {
@@ -128,48 +132,48 @@ an_verdict_abs(const session_summary_t *s, const config_t *c, int lang, char *wh
 
   if(s->danger_s >= 60) {
     v = VERDICT_SERVICE;
-    snprintf(t, sizeof(t), LNGX(lang, "SoC spent %u s at or above %.0f°C.",
-                                      "SoC %u sn boyunca %.0f°C ve üzerinde kaldı."),
-             (unsigned)s->danger_s, (double)c->hot_soc_c);
+    snprintf(t, sizeof(t), LNGX(lang, "SoC spent %u s at or above %.0f%s.",
+                                      "SoC %u sn boyunca %.0f%s ve üzerinde kaldı."),
+             (unsigned)s->danger_s, tc(c, c->hot_soc_c), tsym(c));
     add_reason(why, n, t);
   }
   if(s->ss_fan < 5.0f && s->ss_soc >= 70.0f) {
     v = VERDICT_SERVICE;
-    snprintf(t, sizeof(t), LNGX(lang, "SoC %.0f°C with the fan at %.0f%%: the fan may not be spinning.",
-                                      "SoC %.0f°C iken fan %%%.0f: fan dönmüyor olabilir."), soc, fan);
+    snprintf(t, sizeof(t), LNGX(lang, "SoC %.0f%s with the fan at %.0f%%: the fan may not be spinning.",
+                                      "SoC %.0f%s iken fan %%%.0f: fan dönmüyor olabilir."), tc(c, soc), tsym(c), fan);
     add_reason(why, n, t);
   }
   if(s->ss_fan >= c->abs_service_fan && s->ss_soc >= c->abs_service_soc) {
     v = maxv(v, VERDICT_SERVICE);
-    snprintf(t, sizeof(t), LNGX(lang, "Fan at %.0f%% and SoC still %.0f°C: cooling is insufficient.",
-                                      "Fan %%%.0f'de çalışırken SoC %.0f°C: soğutma yetersiz."), fan, soc);
+    snprintf(t, sizeof(t), LNGX(lang, "Fan at %.0f%% and SoC still %.0f%s: cooling is insufficient.",
+                                      "Fan %%%.0f'de çalışırken SoC %.0f%s: soğutma yetersiz."), fan, tc(c, soc), tsym(c));
     add_reason(why, n, t);
   } else if(s->ss_fan >= c->abs_clean_fan && s->ss_soc >= c->abs_clean_soc) {
     v = maxv(v, VERDICT_CLEAN);
-    snprintf(t, sizeof(t), LNGX(lang, "Fan %.0f%% and SoC %.0f°C: the fan struggles to hold the temperature at high speed.",
-                                      "Fan %%%.0f ve SoC %.0f°C: fan yüksek devirde sıcaklığı zor tutuyor."), fan, soc);
+    snprintf(t, sizeof(t), LNGX(lang, "Fan %.0f%% and SoC %.0f%s: the fan struggles to hold the temperature at high speed.",
+                                      "Fan %%%.0f ve SoC %.0f%s: fan yüksek devirde sıcaklığı zor tutuyor."), fan, tc(c, soc), tsym(c));
     add_reason(why, n, t);
   } else if(s->ss_fan >= c->abs_watch_fan && s->ss_soc >= c->abs_watch_soc) {
     v = maxv(v, VERDICT_WATCH);
-    snprintf(t, sizeof(t), LNGX(lang, "Fan %.0f%% and SoC %.0f°C: slightly above normal.",
-                                      "Fan %%%.0f ve SoC %.0f°C: normalin biraz üstünde."), fan, soc);
+    snprintf(t, sizeof(t), LNGX(lang, "Fan %.0f%% and SoC %.0f%s: slightly above normal.",
+                                      "Fan %%%.0f ve SoC %.0f%s: normalin biraz üstünde."), fan, tc(c, soc), tsym(c));
     add_reason(why, n, t);
   }
   if(s->hot_share >= 0.5f && v < VERDICT_CLEAN) {
     v = VERDICT_CLEAN;
-    snprintf(t, sizeof(t), LNGX(lang, "Fan >= 80%% and SoC >= 80°C for %.0f%% of the session.",
-                                      "Oturumun %%%.0f'inde fan >= %%80 ve SoC >= 80°C."),
-             (double)(s->hot_share * 100.0f));
+    snprintf(t, sizeof(t), LNGX(lang, "Fan >= 80%% and SoC >= %.0f%s for %.0f%% of the session.",
+                                      "Fan >= %%80 ve SoC >= %.0f%s durumu oturumun %%%.0f'inde sürdü."),
+             tc(c, 80.0), tsym(c), (double)(s->hot_share * 100.0f));
     add_reason(why, n, t);
   }
   if(v == VERDICT_OK) {
     if(s->power_valid)
-      snprintf(why, n, LNGX(lang, "SoC %.0f°C, fan %.0f%%, %.0f W: values are in the normal range.",
-                                  "SoC %.0f°C, fan %%%.0f, %.0f W: değerler normal aralıkta."),
-               soc, fan, (double)s->ss_power);
+      snprintf(why, n, LNGX(lang, "SoC %.0f%s, fan %.0f%%, %.0f W: values are in the normal range.",
+                                  "SoC %.0f%s, fan %%%.0f, %.0f W: değerler normal aralıkta."),
+               tc(c, soc), tsym(c), fan, (double)s->ss_power);
     else
-      snprintf(why, n, LNGX(lang, "SoC %.0f°C, fan %.0f%%: values are in the normal range.",
-                                  "SoC %.0f°C, fan %%%.0f: değerler normal aralıkta."), soc, fan);
+      snprintf(why, n, LNGX(lang, "SoC %.0f%s, fan %.0f%%: values are in the normal range.",
+                                  "SoC %.0f%s, fan %%%.0f: değerler normal aralıkta."), tc(c, soc), tsym(c), fan);
   }
   return v;
 }
@@ -252,9 +256,9 @@ an_verdict_rel(float recent_cdi, unsigned recent_n, const baseline_t *b, const c
         : d >= c->clean_drift   ? VERDICT_CLEAN
         : d >= c->watch_drift   ? VERDICT_WATCH
         : VERDICT_OK;
-  snprintf(why, n, LNGX(lang, "Cooling index %+.1f°C vs. baseline (baseline %.1f ± %.1f, last %u sessions %.1f).",
-                              "Soğutma indeksi referansa göre %+.1f°C (referans %.1f ± %.1f, son %u oturum %.1f)."),
-           (double)d, (double)b->cdi_mean, (double)b->cdi_sd, recent_n, (double)recent_cdi);
+  snprintf(why, n, LNGX(lang, "Cooling index %+.1f%s vs. baseline (baseline %.1f ± %.1f, last %u sessions %.1f).",
+                              "Soğutma indeksi referansa göre %+.1f%s (referans %.1f ± %.1f, son %u oturum %.1f)."),
+           td(c, d), tsym(c), tc(c, b->cdi_mean), td(c, b->cdi_sd), recent_n, tc(c, recent_cdi));
   return v;
 }
 
@@ -319,9 +323,9 @@ an_overall(const session_summary_t *hist, unsigned n, uint32_t epoch, const conf
   for(int l = 0; l < LANG_COUNT; l++) {
     if(o->trend_valid)
       snprintf(o->trend_text[l], AN_REASON_LEN,
-               LNGX(l, "Trend over %u sessions: %+.1f°C per 30 days.%s",
-                       "Eğilim: %u oturum üzerinden %+.1f°C / 30 gün.%s"),
-               tn, (double)o->trend_per_30d,
+               LNGX(l, "Trend over %u sessions: %+.1f%s per 30 days.%s",
+                       "Eğilim: %u oturum üzerinden %+.1f%s / 30 gün.%s"),
+               tn, td(c, o->trend_per_30d), tsym(c),
                worse ? LNGX(l, " Cooling is getting worse over time.", " Soğutma zamanla kötüleşiyor.") : "");
     else
       snprintf(o->trend_text[l], AN_REASON_LEN, "%s",

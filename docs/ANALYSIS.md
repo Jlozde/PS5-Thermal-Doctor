@@ -2,7 +2,7 @@
 
 **English** · [Türkçe](ANALYSIS.tr.md)
 
-This document explains what `src/analysis.c` does and why. Every threshold can be changed in `config.ini`.
+This document explains what `src/analysis.c` does and why. Every threshold can be changed in the Settings tab of the web UI or in `config.ini`.
 
 ## Physics
 
@@ -84,6 +84,8 @@ A hot PS5 does not lower its FPS: it spins the fan up and, if that is not enough
 ## Language of the texts
 
 Every reason, label and piece of advice is produced in both English and Turkish at the same time (`an_overall` fills both). The API returns the language asked for with `?lang=`. Notifications and the log use the `lang` setting.
+
+Temperatures in the texts follow the `temp_unit` setting: °C by default, °F if chosen. Only the text changes. Measurements, the CDI and every threshold are stored and compared in °C. Absolute values are converted with ×1.8 + 32, differences (drift, trend, warm-up rate) with ×1.8. The log always stays in °C.
 
 ## Known limits
 

@@ -37,4 +37,15 @@ const char *i18n_code(int lang);           /* LANG_* -> "en" / "tr" / "auto" */
 #define LNG(en, tr)        (i18n_get() == LANG_TR ? (tr) : (en))
 #define LNGX(lang, en, tr) ((lang) == LANG_TR ? (tr) : (en))
 
+/* Temperature display unit (config.ini "temp_unit"). Values are always measured,
+   stored and compared in °C; only text shown to the user is converted. The log
+   stays in °C. */
+enum { TEMP_C = 0, TEMP_F = 1 };
+
+int         i18n_parse_unit(const char *s);   /* "c" / "f" (also celsius / fahrenheit) -> TEMP_*, -1 if unknown */
+const char *i18n_unit_code(int unit);         /* "c" / "f" */
+const char *i18n_unit_sym(int unit);          /* "°C" / "°F" */
+double      i18n_temp(double c, int unit);    /* an absolute temperature */
+double      i18n_tdelta(double c, int unit);  /* a temperature difference or rate */
+
 #endif

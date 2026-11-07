@@ -77,8 +77,13 @@ Payload ikinci kez gönderilirse eski örnek kendiliğinden durdurulur: pid'i po
 ## Dil
 
 - Web arayüzü: başlıktaki **EN / TR** düğmeleri.
-- Bildirimler, günlük ve payload çıktısı: `/data/ps5td/config.ini` içindeki `lang = auto | en | tr`. Web arayüzünde "Bakım ve ayarlar" bölümünden de değiştirilebilir. `auto`, PS5 sistem dilini izler.
+- Bildirimler, günlük ve payload çıktısı: `/data/ps5td/config.ini` içindeki `lang = auto | en | tr`. Web arayüzünün Ayarlar sekmesinden de değiştirilebilir. `auto`, PS5 sistem dilini izler.
 - Açılış günlüğü seçilen dili yazar, örneğin `Dil: tr (ayar auto, PS5 sistem dili kodu 19).`
+
+## Sıcaklık birimi
+
+- Varsayılan Celsius'tur. Fahrenheit'ı Ayarlar sekmesinden seçin ya da `config.ini`'de `temp_unit = f` yazın.
+- Birim web arayüzünü ve PS5 bildirimlerini değiştirir. Günlük ve `config.ini`'deki eşikler her zaman °C kalır; Ayarlar sekmesi bunları gösterirken dönüştürür.
 
 ## Otomatik başlatma (etaHEN)
 

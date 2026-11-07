@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef enum { CT_UINT, CT_INT, CT_FLOAT, CT_LANG } ctype_t;
+typedef enum { CT_UINT, CT_INT, CT_FLOAT, CT_LANG, CT_UNIT } ctype_t;
 
 typedef struct {
   const char *key;
@@ -27,6 +27,8 @@ typedef struct {
 static const citem_t g_items[] = {
   CI("lang",              CT_LANG,  lang,              "Language: auto (PS5 system language), en, tr",
                                                        "Dil: auto (PS5 sistem dili), en, tr"),
+  CI("temp_unit",         CT_UNIT,  temp_unit,         "Temperature unit: c (Celsius) or f (Fahrenheit); thresholds below stay in °C",
+                                                       "Sıcaklık birimi: c (Celsius) veya f (Fahrenheit); aşağıdaki eşikler °C kalır"),
   CI("http_port",         CT_UINT,  http_port,         "Web UI port", "Web arayüzü portu"),
   CI("sample_ms",         CT_UINT,  sample_ms,         "Sampling interval, ms (1000 recommended)",
                                                        "Örnekleme aralığı, ms (1000 önerilir)"),
@@ -71,6 +73,7 @@ void
 config_defaults(config_t *c) {
   memset(c, 0, sizeof(*c));
   c->lang              = LANG_AUTO;
+  c->temp_unit         = TEMP_C;
   c->http_port         = 8088;
   c->sample_ms         = 1000;
   c->csv_every_s       = 5;
@@ -107,6 +110,7 @@ clamp_f(float *v, float lo, float hi) { if(*v < lo) *v = lo; if(*v > hi) *v = hi
 void
 config_sanitize(config_t *c) {
   if(c->lang != LANG_EN && c->lang != LANG_TR) c->lang = LANG_AUTO;
+  if(c->temp_unit != TEMP_F) c->temp_unit = TEMP_C;
   clamp_u(&c->http_port, 1024, 65535);
   clamp_u(&c->sample_ms, 250, 10000);
   clamp_u(&c->csv_every_s, 1, 600);
@@ -154,6 +158,7 @@ apply_line(config_t *c, char *line) {
       case CT_INT:  { long v = strtol(val, &end, 10); if(end == val) return -1; *(int *)p = (int)v; break; }
       case CT_FLOAT:{ float v = strtof(val, &end); if(end == val) return -1; *(float *)p = v; break; }
       case CT_LANG: { int v = i18n_parse(val); if(v < LANG_AUTO) return -1; *(int *)p = v; break; }
+      case CT_UNIT: { int v = i18n_parse_unit(val); if(v < 0) return -1; *(int *)p = v; break; }
     }
     return 0;
   }
@@ -206,6 +211,7 @@ config_to_text(const config_t *c, char *out, size_t n) {
       case CT_INT:   snprintf(val, sizeof(val), "%d", *(const int *)p); break;
       case CT_FLOAT: snprintf(val, sizeof(val), "%.2f", (double)*(const float *)p); break;
       case CT_LANG:  snprintf(val, sizeof(val), "%s", i18n_code(*(const int *)p)); break;
+      case CT_UNIT:  snprintf(val, sizeof(val), "%s", i18n_unit_code(*(const int *)p)); break;
     }
     w = snprintf(out + used, n - used, "# %s\n# %s\n%s = %s\n\n",
                  g_items[i].help_en, g_items[i].help_tr, g_items[i].key, val);

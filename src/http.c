@@ -331,8 +331,8 @@ h_status(int fd, const char *query) {
   jb_puts(&j, "{\"app\":\"ps5td\",\"version\":\"" PS5TD_VERSION "\"");
   jb_printf(&j, ",\"pid\":%d,\"fw\":", (int)getpid()); jb_str(&j, fw);
   jb_puts(&j, ",\"ip\":"); jb_str(&j, ip);
-  jb_printf(&j, ",\"lang\":\"%s\",\"console_lang\":\"%s\",\"config_lang\":\"%s\"",
-            i18n_code(lang), i18n_code(i18n_get()), i18n_code(cfg.lang));
+  jb_printf(&j, ",\"lang\":\"%s\",\"console_lang\":\"%s\",\"config_lang\":\"%s\",\"temp_unit\":\"%s\"",
+            i18n_code(lang), i18n_code(i18n_get()), i18n_code(cfg.lang), i18n_unit_code(cfg.temp_unit));
   jb_printf(&j, ",\"uptime_s\":%llu", (unsigned long long)((util_mono_ms() - g_start_ms) / 1000ULL));
   jb_puts(&j, ",\"symbols\":"); jb_str(&j, plat_symbols_text(lang));
   jb_puts(&j, ",\"dce\":"); jb_str(&j, plat_dce_text(lang));

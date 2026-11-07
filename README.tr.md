@@ -32,6 +32,7 @@ Yalnızca sıcaklığa bakarak bu yakalanamaz. PS5 Thermal Doctor **fan devrini,
 - **Yalnızca okur.** Overlay yok, fan kontrolü yok, ayar değiştirme yok. Sensörleri okur ve konsolda hiçbir şeyi değiştirmez.
 - **Sonuç baktığınız yerde.** Oyun kapanınca PS5 bildirimi, telefonda veya PC'de web arayüzü.
 - **İngilizce ve Türkçe.** Kullanıcının gördüğü her metin iki dilde de var.
+- **°C veya °F.** Varsayılan Celsius; Ayarlar sekmesinden Fahrenheit seçilebilir.
 
 ## Nasıl çalışır
 
@@ -43,7 +44,7 @@ Yalnızca sıcaklığa bakarak bu yakalanamaz. PS5 Thermal Doctor **fan devrini,
    `CDI = T_soc + 0,30·(fan% − 40) − 0,25·(W − 150)`. Aynı işi daha sıcak ve daha hızlı fanla yapan cihazın CDI'sı yükselir. Referansa göre +4 °C İZLE, +8 °C TEMİZLİK, +14 °C SERVİS'tir.
 3. **Eğilim**: 14 günden uzun sürede 6+ oturum varsa CDI'nin aylık eğimi hesaplanır. Ayda +2 °C ve üzeri uyarı verir.
 
-Temizlik yaptıktan sonra web arayüzündeki **"Yeni referans"** düğmesi karşılaştırmayı sıfırlar. Ayrıntı: [docs/ANALYSIS.tr.md](docs/ANALYSIS.tr.md).
+Temizlik yaptıktan sonra web arayüzünün Ayarlar sekmesindeki **"Yeni referans"** düğmesi karşılaştırmayı sıfırlar. Ayrıntı: [docs/ANALYSIS.tr.md](docs/ANALYSIS.tr.md).
 
 ## Ne görürsünüz
 
@@ -54,6 +55,10 @@ Temizlik yaptıktan sonra web arayüzündeki **"Yeni referans"** düğmesi karş
 ![Giderek tozlanan bir konsolun oturum geçmişi](docs/images/history-dusty.tr.png)
 
 <sub>İki ay içinde giderek tozlanan bir konsolun oturum geçmişi. Soğutma talep indeksi izle, temizlik ve servis çizgilerini sırayla geçiyor.</sub>
+
+![Ayarlar sekmesi](docs/images/settings.tr.png)
+
+<sub>Ayarlar sekmesi: konsol dili, sıcaklık birimi, bildirimler, ölçüm ve tüm karar eşikleri, her biri kısa bir açıklamayla. Sıcaklıklar varsayılan olarak °C gösterilir, °F'ye geçilebilir.</sub>
 
 ## Ne okur
 
@@ -85,16 +90,16 @@ Payload her konsol yeniden başlatmasında tekrar gönderilmelidir. etaHEN bunu 
 | Nerede | Dil nasıl seçilir |
 |---|---|
 | Web arayüzü | Başlıktaki **EN / TR** düğmeleri ya da adreste `?lang=en` / `?lang=tr`. İlk ziyarette tarayıcı dili kullanılır; seçim tarayıcıda hatırlanır. |
-| PS5 bildirimleri, günlük dosyası, payload çıktısı | `config.ini` içindeki `lang` anahtarı: `auto` (PS5 sistem dili; Türkçe ise Türkçe, diğerleri İngilizce), `en` veya `tr`. |
+| PS5 bildirimleri, günlük dosyası, payload çıktısı | Ayarlar sekmesindeki **Konsol dili** (`config.ini` içindeki `lang` anahtarı): `auto` (PS5 sistem dili; Türkçe ise Türkçe, diğerleri İngilizce), `en` veya `tr`. |
 | JSON API | `/api/status` ve `/api/log` için `?lang=en` veya `?lang=tr`. Verilmezse konsol dili kullanılır. |
-| `config.ini` | Her anahtarın her iki dilde açıklama satırı vardır. |
+| `config.ini` | Her anahtarın her iki dilde açıklama satırı vardır. Ayarlar sekmesi aynı anahtarları düzenler. |
 
 Bellekteki günlük her satırı iki dilde tutar. Bu yüzden web arayüzünün dilini değiştirmek günlük görünümünü de değiştirir.
 
 ## Konsoldaki dosyalar
 
 ```
-/data/ps5td/config.ini      ayarlar (web arayüzünden düzenlenir)
+/data/ps5td/config.ini      ayarlar (web arayüzünün Ayarlar sekmesinden düzenlenir)
 /data/ps5td/history.csv     oturum özetleri
 /data/ps5td/sessions/*.csv  oturum başına 5 sn'lik ham veri
 /data/ps5td/state.ini       referans sayacı

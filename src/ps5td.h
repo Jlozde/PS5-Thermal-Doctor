@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #define PS5TD_NAME          "PS5 Thermal Doctor"
-#define PS5TD_VERSION       "0.2.0"
+#define PS5TD_VERSION       "0.2.1"
 #define PS5TD_PROCESS_NAME  "ps5td.elf"
 
 #define PS5TD_DATA_DIR      "/data/ps5td"
@@ -56,6 +56,7 @@ enum {
 /* Settings (config.ini) */
 typedef struct {
   int      lang;              /* LANG_AUTO / LANG_EN / LANG_TR (i18n.h)       */
+  int      temp_unit;         /* TEMP_C / TEMP_F: display only (i18n.h)       */
   unsigned http_port;
   unsigned sample_ms;
   unsigned csv_every_s;

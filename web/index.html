@@ -7,10 +7,15 @@
 <style>
 :root{--bg:#0e1116;--card:#171b22;--line:#242a34;--txt:#e6e9ef;--mut:#8b94a3;--ok:#2ecc71;--watch:#f1c40f;--clean:#e67e22;--service:#e74c3c;--na:#6c7786;--acc:#4ea1ff}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-header{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(14,17,22,.95);backdrop-filter:blur(6px);z-index:5;flex-wrap:wrap}
+header{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(14,17,22,.95);backdrop-filter:blur(6px);z-index:5;flex-wrap:wrap}
 header h1{font-size:18px;margin:0;letter-spacing:.3px}
 header .meta{color:var(--mut);font-size:13px}
+.tabs{display:flex;gap:4px}
+.tabs a{color:var(--mut);text-decoration:none;padding:6px 12px;border-radius:8px;font-size:14px}
+.tabs a:hover{color:var(--txt);background:#1a1f27}
+.tabs a.on{color:#fff;background:#1c3550}
 .pill{margin-left:auto;font-size:12px;padding:4px 10px;border-radius:999px;background:#222933;color:var(--mut)}
 .pill.on{background:#143b2a;color:var(--ok)}
 .pill.off{background:#3b1b1b;color:var(--service)}
@@ -48,18 +53,42 @@ th{color:var(--mut);font-weight:500;text-transform:uppercase;font-size:11px;lett
 td:first-child,th:first-child,td:nth-child(2),th:nth-child(2){text-align:left}
 .tbl-wrap{overflow:auto;max-height:420px}
 a{color:var(--acc)}
-.btns{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 button.b{background:#1c3550;border:1px solid #2b5c8f;color:#fff;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:14px}
 button.b.warn{background:#4a2a12;border-color:#8a4b1b}
-button.b:disabled{opacity:.5;cursor:default}
-textarea{width:100%;background:#0f1319;color:#d9dee8;border:1px solid var(--line);border-radius:8px;padding:10px;font:13px/1.4 ui-monospace,Consolas,monospace;resize:vertical}
-pre{background:#0f1319;border:1px solid var(--line);border-radius:8px;padding:10px;font:12px/1.4 ui-monospace,Consolas,monospace;max-height:280px;overflow:auto;white-space:pre-wrap;word-break:break-all;color:#b9c1cf;margin:0}
-.msg{color:var(--mut);font-size:13px;margin-left:10px}
+button.b.ghost{background:transparent;border-color:var(--line);color:var(--txt)}
+button.b:disabled{opacity:.45;cursor:default}
+pre{background:#0f1319;border:1px solid var(--line);border-radius:8px;padding:10px;font:12px/1.4 ui-monospace,Consolas,monospace;max-height:320px;overflow:auto;white-space:pre-wrap;word-break:break-all;color:#b9c1cf;margin:0}
+.msg{color:var(--mut);font-size:13px}
 .hint{color:var(--mut);font-size:13px;margin:0 0 12px}
 .live-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;font-size:13px}
 .live-sum div{background:#10141a;border-radius:8px;padding:8px 10px}
 .live-sum b{display:block;font-size:17px}
 .muted{color:var(--mut)}
+/* settings */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}
+@media(max-width:900px){.sgrid{grid-template-columns:1fr}}
+.sgroup{border-top:1px solid var(--line);padding:14px 0 6px}
+.sgroup h3{font-size:15px;margin:0 0 4px;font-weight:600}
+.sgroup>.hint{margin:0 0 6px}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed #1f252e}
+.srow:last-child{border-bottom:0}
+.srow .sl{flex:1;min-width:0;cursor:pointer}
+.srow .sl b{display:block;font-weight:500}
+.srow .sl small{display:block;color:var(--mut);font-size:12px;line-height:1.4;margin-top:1px}
+.srow .sl code{display:inline-block;color:#5f6b7c;font:11px ui-monospace,Consolas,monospace;margin-top:2px}
+.sin{display:flex;align-items:center;gap:6px;flex:none}
+.sin .su{color:var(--mut);font-size:13px;min-width:34px}
+.sin input[type=number],.sin select{background:#0f1319;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font:inherit;font-size:14px}
+.sin input[type=number]{width:110px;text-align:right}
+.sin select{width:auto;min-width:150px;max-width:230px}
+.sin input[type=checkbox]{width:20px;height:20px;accent-color:var(--acc);margin:0;cursor:pointer}
+.srow.dirty .sl b::after{content:" •";color:var(--acc)}
+.srow.dirty .sin input[type=number],.srow.dirty .sin select{border-color:#2b5c8f}
+.srow.bad .sin input{border-color:var(--service)}
+.savebar{position:sticky;bottom:0;display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin:12px -16px -16px;padding:12px 16px;background:rgba(23,27,34,.97);border-top:1px solid var(--line);border-radius:0 0 12px 12px}
+.savebar .msg{margin-right:auto}
+@media(max-width:600px){.srow{flex-wrap:wrap}.sin{width:100%;justify-content:flex-end}}
 footer{color:var(--mut);font-size:12px;text-align:center;padding:14px}
 footer .disc{max-width:760px;margin:6px auto 0;line-height:1.5}
 </style>
@@ -67,12 +96,14 @@ footer .disc{max-width:760px;margin:6px auto 0;line-height:1.5}
 <body>
 <header>
   <h1>PS5 Thermal Doctor</h1>
+  <nav class="tabs" id="tabs"><a href="#overview" data-tab="overview" data-i18n="tab_overview">Overview</a><a href="#settings" data-tab="settings" data-i18n="tab_settings">Settings</a></nav>
   <span class="meta" id="hdr-meta" data-i18n="connecting">connecting…</span>
   <span class="pill" id="conn">…</span>
   <div class="seg" id="lang" title="Language / Dil"><button data-l="en">EN</button><button data-l="tr">TR</button></div>
 </header>
 <main>
 
+<div id="tab-overview">
 <section class="card verdict na" id="verdict">
   <div class="v-title"><span class="badge na" id="v-badge">–</span><span id="v-label" data-i18n="loading">Loading…</span></div>
   <div class="v-reasons">
@@ -85,8 +116,8 @@ footer .disc{max-width:760px;margin:6px auto 0;line-height:1.5}
 </section>
 
 <section class="grid">
-  <div class="stat"><span class="lbl" data-i18n="st_soc">SoC (chip)</span><span class="val" id="s-soc">–</span><span class="unit">°C</span><span class="sub" id="s-soc-sub" data-i18n="st_soc_sub">hottest of channels 1-7</span></div>
-  <div class="stat"><span class="lbl">CPU</span><span class="val" id="s-cpu">–</span><span class="unit">°C</span><span class="sub" id="s-gpu-sub">–</span></div>
+  <div class="stat"><span class="lbl" data-i18n="st_soc">SoC (chip)</span><span class="val" id="s-soc">–</span><span class="unit tu">°C</span><span class="sub" id="s-soc-sub" data-i18n="st_soc_sub">hottest of channels 1-7</span></div>
+  <div class="stat"><span class="lbl">CPU</span><span class="val" id="s-cpu">–</span><span class="unit tu">°C</span><span class="sub" id="s-gpu-sub">–</span></div>
   <div class="stat"><span class="lbl">Fan</span><span class="val" id="s-fan">–</span><span class="unit">%</span><span class="sub" id="s-fan-sub">–</span></div>
   <div class="stat"><span class="lbl" data-i18n="st_power">Power</span><span class="val" id="s-pw">–</span><span class="unit">W</span><span class="sub" id="s-pw-sub">GPU – · CPU – · RAM –</span></div>
   <div class="stat"><span class="lbl">FPS</span><span class="val" id="s-fps">–</span><span class="unit"></span><span class="sub" id="s-fps-sub" data-i18n="st_fps_sub">display flip rate</span></div>
@@ -105,7 +136,7 @@ footer .disc{max-width:760px;margin:6px auto 0;line-height:1.5}
   </div>
   <div class="two">
     <div><canvas id="c-temp" height="240"></canvas>
-      <div class="legend"><span><i style="background:#ff6b6b"></i>SoC °C</span><span><i style="background:#ffb347"></i>CPU °C</span><span><i style="background:#4ea1ff"></i>Fan %</span><span><i style="background:#2a3340"></i><span data-i18n="lg_game">game running</span></span></div></div>
+      <div class="legend"><span><i style="background:#ff6b6b"></i>SoC <span class="tu">°C</span></span><span><i style="background:#ffb347"></i>CPU <span class="tu">°C</span></span><span><i style="background:#4ea1ff"></i>Fan %</span><span><i style="background:#2a3340"></i><span data-i18n="lg_game">game running</span></span></div></div>
     <div><canvas id="c-pw" height="240"></canvas>
       <div class="legend"><span><i style="background:#b388ff"></i><span data-i18n="lg_power">Power W</span></span><span><i style="background:#2ecc71"></i>FPS</span></div></div>
   </div>
@@ -116,26 +147,34 @@ footer .disc{max-width:760px;margin:6px auto 0;line-height:1.5}
   <canvas id="c-hist" height="220"></canvas>
   <div class="legend"><span><i style="background:#4ea1ff"></i><span data-i18n="lg_cdi">CDI (°C equivalent)</span></span><span><i style="background:#2a4d3a"></i><span data-i18n="lg_band">baseline band</span></span><span><i style="background:var(--watch)"></i><span data-i18n="lv_watch">watch</span></span><span><i style="background:var(--clean)"></i><span data-i18n="lv_clean">clean</span></span><span><i style="background:var(--service)"></i><span data-i18n="lv_service">service</span></span></div>
   <div class="tbl-wrap" style="margin-top:12px">
-    <table id="t-hist"><thead><tr><th data-i18n="th_date">Date</th><th data-i18n="th_game">Game</th><th data-i18n="th_dur">Duration</th><th>SoC</th><th>CPU</th><th>Fan</th><th data-i18n="th_power">Power</th><th>FPS</th><th data-i18n="th_maxsoc">Peak SoC</th><th data-i18n="th_warm">Warm-up</th><th>CDI</th><th data-i18n="th_verdict">Verdict</th><th>CSV</th></tr></thead><tbody></tbody></table>
+    <table id="t-hist"><thead><tr><th data-i18n="th_date">Date</th><th data-i18n="th_game">Game</th><th data-i18n="th_dur">Duration</th><th>SoC <span class="tu">°C</span></th><th>CPU <span class="tu">°C</span></th><th>Fan</th><th data-i18n="th_power">Power</th><th>FPS</th><th data-i18n="th_maxsoc">Peak SoC</th><th data-i18n="th_warm">Warm-up</th><th>CDI</th><th data-i18n="th_verdict">Verdict</th><th>CSV</th></tr></thead><tbody></tbody></table>
   </div>
+</section>
+</div>
+
+<div id="tab-settings" hidden>
+<section class="card">
+  <h2 data-i18n="set_title">Settings</h2>
+  <p class="hint" data-i18n="set_hint">Saved changes apply right away unless a setting says otherwise.</p>
+  <form id="set-form" novalidate autocomplete="off"><div class="sgrid" id="set-groups"></div></form>
+  <div class="savebar"><span class="msg" id="cfg-msg"></span><button class="b ghost" id="b-discard" disabled data-i18n="b_discard">Discard changes</button><button class="b" id="b-save" disabled data-i18n="b_save">Save</button></div>
 </section>
 
 <section class="card">
-  <h2 data-i18n="maint_title">Maintenance and settings</h2>
-  <p class="hint" data-i18n="maint_hint">The buttons at the top switch the page language. PS5 notifications and the log file follow the "lang" setting below (auto = PS5 system language).</p>
+  <h2 data-i18n="maint_title">Maintenance</h2>
+  <p class="hint" data-i18n="maint_hint">After cleaning or servicing the console, start a new baseline.</p>
   <div class="btns">
     <button class="b warn" id="b-baseline" data-i18n="b_baseline">I cleaned it → start a new baseline</button>
     <button class="b" id="b-notify" data-i18n="b_notify">Test notification on the PS5</button>
-    <button class="b" id="b-reload" data-i18n="b_reload">Reload settings</button>
+    <span class="msg" id="maint-msg"></span>
   </div>
-  <textarea id="cfg" rows="16" spellcheck="false"></textarea>
-  <div style="margin-top:10px"><button class="b" id="b-save" data-i18n="b_save">Save settings</button><span class="msg" id="cfg-msg"></span></div>
 </section>
 
 <section class="card">
   <div class="card-h"><h2 data-i18n="log">Log</h2><span class="muted" id="diag"></span></div>
   <pre id="log">…</pre>
 </section>
+</div>
 
 </main>
 <footer><div data-i18n="footer">PS5 Thermal Doctor · GPL-3.0 · data under /data/ps5td</div><div class="disc" data-i18n="disclaimer">These verdicts are estimates, not a guarantee. A healthy result does not rule out a problem, so trust your own checks first. An unhealthy result may need attention right away.</div></footer>
@@ -144,28 +183,71 @@ footer .disc{max-width:760px;margin:6px auto 0;line-height:1.5}
 const $ = s => document.querySelector(s);
 
 /* ---------- languages ---------- */
+// "{0}" in a string that is set through data-i18n is the temperature symbol (°C / °F).
 const I18N = {
   en: {
     connecting:'connecting…', connected:'connected', offline:'offline', loading:'Loading…',
+    tab_overview:'Overview', tab_settings:'Settings',
     st_soc:'SoC (chip)', st_soc_sub:'hottest of channels 1-7', channels:'channels: ', gpu_side:'GPU side (ch7): ',
     raw:'raw: ', st_power:'Power', cpu_not_live:' (*CPU rail is not a live reading, left out of the total)',
     st_fps_sub:'display flip rate', st_game:'Game', no_session:'no session', game:'game', none:'none', session_dur:'session {0}',
     live_title:'This session (interim summary, every 30 s)', ls_soc:'Steady SoC', ls_fan:'Steady fan', ls_power:'Power',
-    ls_maxsoc:'Peak SoC', ls_warm:'Warm-up rate', ls_verdict:'Interim verdict', per_min:' °C/min',
+    ls_maxsoc:'Peak SoC', ls_warm:'Warm-up rate', ls_verdict:'Interim verdict', per_min:' {0}/min',
     live:'Live', r10:'10 min', r30:'30 min', r120:'2 h', lg_game:'game running', lg_power:'Power W', no_data:'no data yet',
-    hist_title:'Session history · cooling demand index (CDI)', lg_cdi:'CDI (°C equivalent)', lg_band:'baseline band',
+    hist_title:'Session history · cooling demand index (CDI)', lg_cdi:'CDI ({0} equivalent)', lg_band:'baseline band',
     lv_base:'baseline', lv_watch:'watch', lv_clean:'clean', lv_service:'service',
-    th_date:'Date', th_game:'Game', th_dur:'Duration', th_power:'Power', th_maxsoc:'Peak SoC', th_warm:'Warm-up', th_verdict:'Verdict',
+    th_date:'Date', th_game:'Game', th_dur:'Duration', th_power:'Power', th_maxsoc:'Peak SoC {0}', th_warm:'Warm-up {0}/min', th_verdict:'Verdict',
     old_base:'(old baseline)', download:'download', hist_meta:'{0} sessions · {1} comparable (counter {2})',
     last_session:'Last session: ', baseline:'Baseline: ',
     m_base_ok:'Baseline {0} sessions, CDI {1} ± {2}', m_base_need:'Baseline {0}/{1} sessions',
     m_recent:'Last {0} sessions CDI {1} (drift {2})', m_last:'Last session: {0} · {1}',
     m_epoch_since:'Baseline counter {0} (since {1})', m_epoch:'Baseline counter {0}',
     hdr_meta:'v{0} · FW {1} · {2} · up {3} · {4} sessions',
-    maint_title:'Maintenance and settings',
-    maint_hint:'The buttons at the top switch the page language. PS5 notifications and the log file follow the "lang" setting below (auto = PS5 system language).',
-    b_baseline:'I cleaned it → start a new baseline', b_notify:'Test notification on the PS5', b_reload:'Reload settings', b_save:'Save settings',
-    saving:'saving…', saved:'saved', saved_bad:'saved, {0} bad lines skipped', error:'error: ',
+    set_title:'Settings',
+    set_hint:'Saved changes apply right away unless a setting says otherwise. Temperatures are shown in the selected unit; the console stores them in °C.',
+    g_general:'General', g_notify:'PS5 notifications', g_measure:'Measurement', g_session:'Sessions',
+    g_abs:'Verdict thresholds',
+    g_abs_h:'A level applies when the steady fan speed and the SoC temperature both reach its values. The highest level reached wins.',
+    g_cdi:'Baseline comparison (CDI)',
+    g_cdi_h:'The cooling demand index (CDI) puts SoC temperature, fan speed and power into one value. The latest sessions are compared with the baseline sessions.',
+    f_lang:'Console language', h_lang:'Used for PS5 notifications and the log. The page language is chosen at the top.',
+    o_auto:'Auto (PS5 system language)',
+    f_temp_unit:'Temperature unit', h_temp_unit:'Used on this page and in PS5 notifications. The log stays in °C.',
+    o_c:'Celsius (°C)', o_f:'Fahrenheit (°F)',
+    f_http_port:'Web UI port', h_http_port:'Applies after the payload is restarted.',
+    f_notify_startup:'Notification at start', h_notify_startup:'Shown on the PS5 when the payload starts.',
+    f_notify_session:'Session summary', h_notify_session:'Shows the result when a game closes.',
+    f_notify_live_warn:'Warning during play', h_notify_live_warn:'Warns when the interim result reaches SERVICE.',
+    f_sample_ms:'Sampling interval', h_sample_ms:'1000 ms is recommended.',
+    f_csv_every_s:'CSV line interval', h_csv_every_s:'How often a line is written to the session CSV file.',
+    f_fps_enabled:'Read FPS', h_fps_enabled:'Read from /dev/dce. Needs the privilege escalation below.',
+    f_escalate:'Escalate privileges', h_escalate:'Needed for FPS. Applies after the payload is restarted.',
+    f_warmup_s:'Warm-up skipped', h_warmup_s:'The start of each session is left out of the steady values.',
+    f_min_ss_s:'Minimum steady time', h_min_ss_s:'Steady time needed before a session gets a verdict.',
+    f_min_session_s:'Minimum session length', h_min_session_s:'Shorter sessions are not recorded.',
+    f_keep_sessions:'Session files kept', h_keep_sessions:'Older session CSV files are deleted.',
+    f_abs_watch_fan:'WATCH · fan', h_abs_watch_fan:'Steady fan speed for WATCH.',
+    f_abs_watch_soc:'WATCH · SoC', h_abs_watch_soc:'Steady SoC temperature for WATCH.',
+    f_abs_clean_fan:'CLEAN · fan', h_abs_clean_fan:'Steady fan speed for CLEAN.',
+    f_abs_clean_soc:'CLEAN · SoC', h_abs_clean_soc:'Steady SoC temperature for CLEAN.',
+    f_abs_service_fan:'SERVICE · fan', h_abs_service_fan:'Steady fan speed for SERVICE.',
+    f_abs_service_soc:'SERVICE · SoC', h_abs_service_soc:'Steady SoC temperature for SERVICE.',
+    f_hot_soc_c:'Dangerous SoC', h_hot_soc_c:'60 s or more at or above this means SERVICE on its own.',
+    f_baseline_sessions:'Baseline sessions', h_baseline_sessions:'The first comparable sessions after a new baseline.',
+    f_recent_sessions:'Recent sessions', h_recent_sessions:'Their average is the current value.',
+    f_watch_drift:'WATCH drift', h_watch_drift:'Rise of the current value above the baseline.',
+    f_clean_drift:'CLEAN drift', h_clean_drift:'Rise above the baseline. At least the WATCH drift.',
+    f_service_drift:'SERVICE drift', h_service_drift:'Rise above the baseline. At least the CLEAN drift.',
+    f_k_fan:'Fan weight', h_k_fan:'Temperature equivalent of 1% fan speed.',
+    f_k_pow:'Power weight', h_k_pow:'Temperature equivalent of 1 W.',
+    u_s:'s', b_discard:'Discard changes', b_save:'Save',
+    unsaved:'Unsaved changes: {0}', check_fields:'Check the fields marked in red.',
+    saving:'saving…', saved:'Saved.', saved_bad:'Saved, {0} values were rejected.', error:'error: ',
+    restart_note:' Restart the payload for the port or privilege change to apply.',
+    maint_title:'Maintenance',
+    maint_hint:'After cleaning or servicing the console, start a new baseline. Older sessions are kept but left out of the comparison.',
+    b_baseline:'I cleaned it → start a new baseline', b_notify:'Test notification on the PS5',
+    sent:'Sent.', base_done:'New baseline started.',
     confirm_base:'Start a new baseline?\n\nUse this only after cleaning / servicing the console. Older sessions are kept but left out of the comparison.',
     log:'Log', footer:'PS5 Thermal Doctor · GPL-3.0 · data under /data/ps5td',
     disclaimer:'These verdicts are estimates, not a guarantee. A healthy result does not rule out a problem, so trust your own checks first. An unhealthy result may need attention right away.',
@@ -174,25 +256,67 @@ const I18N = {
   },
   tr: {
     connecting:'bağlanıyor…', connected:'bağlı', offline:'bağlantı yok', loading:'Yükleniyor…',
+    tab_overview:'Genel bakış', tab_settings:'Ayarlar',
     st_soc:'SoC (çip)', st_soc_sub:'kanal 1-7 en sıcağı', channels:'kanallar: ', gpu_side:'GPU yanı (k7): ',
     raw:'ham: ', st_power:'Güç', cpu_not_live:' (*CPU rayı canlı ölçüm değil, toplama dahil edilmedi)',
     st_fps_sub:'ekran flip hızı', st_game:'Oyun', no_session:'oturum yok', game:'oyun', none:'yok', session_dur:'oturum {0}',
     live_title:'Bu oturum (ara özet, 30 sn\'de bir)', ls_soc:'Kararlı SoC', ls_fan:'Kararlı fan', ls_power:'Güç',
-    ls_maxsoc:'Maks SoC', ls_warm:'Isınma hızı', ls_verdict:'Ara karar', per_min:' °C/dk',
+    ls_maxsoc:'Maks SoC', ls_warm:'Isınma hızı', ls_verdict:'Ara karar', per_min:' {0}/dk',
     live:'Canlı', r10:'10 dk', r30:'30 dk', r120:'2 sa', lg_game:'oyun açık', lg_power:'Güç W', no_data:'henüz veri yok',
-    hist_title:'Oturum geçmişi · soğutma talep indeksi (CDI)', lg_cdi:'CDI (°C eşdeğeri)', lg_band:'referans bandı',
+    hist_title:'Oturum geçmişi · soğutma talep indeksi (CDI)', lg_cdi:'CDI ({0} eşdeğeri)', lg_band:'referans bandı',
     lv_base:'referans', lv_watch:'izle', lv_clean:'temizlik', lv_service:'servis',
-    th_date:'Tarih', th_game:'Oyun', th_dur:'Süre', th_power:'Güç', th_maxsoc:'Maks SoC', th_warm:'Isınma', th_verdict:'Karar',
+    th_date:'Tarih', th_game:'Oyun', th_dur:'Süre', th_power:'Güç', th_maxsoc:'Maks SoC {0}', th_warm:'Isınma {0}/dk', th_verdict:'Karar',
     old_base:'(eski ref.)', download:'indir', hist_meta:'{0} oturum · {1} karşılaştırılabilir (sayaç {2})',
     last_session:'Son oturum: ', baseline:'Referans: ',
     m_base_ok:'Referans {0} oturum, CDI {1} ± {2}', m_base_need:'Referans {0}/{1} oturum',
     m_recent:'Son {0} oturum CDI {1} (sapma {2})', m_last:'Son oturum: {0} · {1}',
     m_epoch_since:'Referans sayacı {0} (başlangıç {1})', m_epoch:'Referans sayacı {0}',
     hdr_meta:'v{0} · FW {1} · {2} · {3} açık · {4} oturum',
-    maint_title:'Bakım ve ayarlar',
-    maint_hint:'Üstteki düğmeler sayfanın dilini değiştirir. PS5 bildirimleri ve günlük dosyası aşağıdaki "lang" ayarına uyar (auto = PS5 sistem dili).',
-    b_baseline:'Temizlik yaptım → yeni referans başlat', b_notify:'PS5\'te bildirim testi', b_reload:'Ayarları yeniden yükle', b_save:'Ayarları kaydet',
-    saving:'kaydediliyor…', saved:'kaydedildi', saved_bad:'kaydedildi, {0} hatalı satır atlandı', error:'hata: ',
+    set_title:'Ayarlar',
+    set_hint:'Kaydedilen değişiklikler, ayarda aksi yazmıyorsa hemen uygulanır. Sıcaklıklar seçilen birimde gösterilir; konsol bunları °C olarak saklar.',
+    g_general:'Genel', g_notify:'PS5 bildirimleri', g_measure:'Ölçüm', g_session:'Oturumlar',
+    g_abs:'Karar eşikleri',
+    g_abs_h:'Kararlı fan hızı ve SoC sıcaklığı bir düzeyin değerlerine birlikte ulaşınca o düzey geçerli olur. Ulaşılan en yüksek düzey esas alınır.',
+    g_cdi:'Referans karşılaştırması (CDI)',
+    g_cdi_h:'Soğutma talep indeksi (CDI), SoC sıcaklığını, fan hızını ve gücü tek bir değerde toplar. Son oturumlar referans oturumlarıyla karşılaştırılır.',
+    f_lang:'Konsol dili', h_lang:'PS5 bildirimleri ve günlük için kullanılır. Sayfa dili üstten seçilir.',
+    o_auto:'Otomatik (PS5 sistem dili)',
+    f_temp_unit:'Sıcaklık birimi', h_temp_unit:'Bu sayfada ve PS5 bildirimlerinde kullanılır. Günlük °C kalır.',
+    o_c:'Celsius (°C)', o_f:'Fahrenheit (°F)',
+    f_http_port:'Web arayüzü portu', h_http_port:'Payload yeniden başlatılınca geçerli olur.',
+    f_notify_startup:'Açılışta bildirim', h_notify_startup:'Payload başlayınca PS5\'te gösterilir.',
+    f_notify_session:'Oturum özeti', h_notify_session:'Oyun kapanınca sonucu gösterir.',
+    f_notify_live_warn:'Oyun sırasında uyarı', h_notify_live_warn:'Ara sonuç SERVİS düzeyine ulaşınca uyarır.',
+    f_sample_ms:'Örnekleme aralığı', h_sample_ms:'1000 ms önerilir.',
+    f_csv_every_s:'CSV satır aralığı', h_csv_every_s:'Oturum CSV dosyasına ne sıklıkla satır yazılacağı.',
+    f_fps_enabled:'FPS oku', h_fps_enabled:'/dev/dce üzerinden okunur. Aşağıdaki yetki yükseltmesini gerektirir.',
+    f_escalate:'Yetki yükselt', h_escalate:'FPS için gerekir. Payload yeniden başlatılınca geçerli olur.',
+    f_warmup_s:'Atlanan ısınma süresi', h_warmup_s:'Her oturumun başı kararlı değerlere katılmaz.',
+    f_min_ss_s:'En kısa kararlı süre', h_min_ss_s:'Bir oturumun karar alması için gereken kararlı süre.',
+    f_min_session_s:'En kısa oturum süresi', h_min_session_s:'Daha kısa oturumlar kaydedilmez.',
+    f_keep_sessions:'Saklanan oturum dosyası', h_keep_sessions:'Daha eski oturum CSV dosyaları silinir.',
+    f_abs_watch_fan:'İZLE · fan', h_abs_watch_fan:'İZLE için kararlı fan hızı.',
+    f_abs_watch_soc:'İZLE · SoC', h_abs_watch_soc:'İZLE için kararlı SoC sıcaklığı.',
+    f_abs_clean_fan:'TEMİZLİK · fan', h_abs_clean_fan:'TEMİZLİK için kararlı fan hızı.',
+    f_abs_clean_soc:'TEMİZLİK · SoC', h_abs_clean_soc:'TEMİZLİK için kararlı SoC sıcaklığı.',
+    f_abs_service_fan:'SERVİS · fan', h_abs_service_fan:'SERVİS için kararlı fan hızı.',
+    f_abs_service_soc:'SERVİS · SoC', h_abs_service_soc:'SERVİS için kararlı SoC sıcaklığı.',
+    f_hot_soc_c:'Tehlikeli SoC', h_hot_soc_c:'Bu değerde ya da üstünde 60 sn veya daha uzun kalmak tek başına SERVİS demektir.',
+    f_baseline_sessions:'Referans oturumları', h_baseline_sessions:'Yeni referanstan sonraki ilk karşılaştırılabilir oturumlar.',
+    f_recent_sessions:'Son oturumlar', h_recent_sessions:'Ortalamaları güncel değer olarak alınır.',
+    f_watch_drift:'İZLE sapması', h_watch_drift:'Güncel değerin referansın üstüne çıkışı.',
+    f_clean_drift:'TEMİZLİK sapması', h_clean_drift:'Referansın üstüne çıkış. En az İZLE sapması kadar.',
+    f_service_drift:'SERVİS sapması', h_service_drift:'Referansın üstüne çıkış. En az TEMİZLİK sapması kadar.',
+    f_k_fan:'Fan ağırlığı', h_k_fan:'%1 fan hızının sıcaklık karşılığı.',
+    f_k_pow:'Güç ağırlığı', h_k_pow:'1 W\'ın sıcaklık karşılığı.',
+    u_s:'sn', b_discard:'Değişiklikleri geri al', b_save:'Kaydet',
+    unsaved:'Kaydedilmemiş değişiklik: {0}', check_fields:'Kırmızı işaretli alanları kontrol edin.',
+    saving:'kaydediliyor…', saved:'Kaydedildi.', saved_bad:'Kaydedildi, {0} değer reddedildi.', error:'hata: ',
+    restart_note:' Port ya da yetki değişikliğinin geçerli olması için payload\'ı yeniden başlatın.',
+    maint_title:'Bakım',
+    maint_hint:'Konsolu temizledikten ya da bakım yaptırdıktan sonra yeni referans başlatın. Eski oturumlar saklanır ama karşılaştırmaya katılmaz.',
+    b_baseline:'Temizlik yaptım → yeni referans başlat', b_notify:'PS5\'te bildirim testi',
+    sent:'Gönderildi.', base_done:'Yeni referans başlatıldı.',
     confirm_base:'Yeni referans başlatılsın mı?\n\nBunu yalnızca cihazı temizledikten / bakım yaptırdıktan sonra kullanın. Eski oturumlar saklanır ama karşılaştırma dışı kalır.',
     log:'Günlük', footer:'PS5 Thermal Doctor · GPL-3.0 · veriler /data/ps5td altında',
     disclaimer:'Bu kararlar tahmindir, garanti değildir. Sağlıklı sonuç bir sorunu dışlamaz; önce kendi incelemenize güvenin. Sağlıksız görünen sonuç ise hemen müdahale gerektirebilir.',
@@ -213,29 +337,60 @@ const t = (k, ...a) => { const s = (I18N[LANG][k] ?? I18N.en[k] ?? k); return a.
 const locale = () => LANG==='tr' ? 'tr-TR' : 'en-GB';
 function applyStatic(){
   document.documentElement.lang = LANG;
-  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n, TSYM()); });
+  document.querySelectorAll('.tu').forEach(el => { el.textContent = TSYM(); });
   [...$('#lang').children].forEach(b => b.classList.toggle('on', b.dataset.l===LANG));
+  formUnits();
 }
 function setLang(l){
   LANG = l; try{ localStorage.setItem('ps5td.lang', l); }catch(e){}
-  applyStatic(); setOnline(online); pollStatus(); pollLive(); pollSessions(); pollLog();
+  applyStatic(); setOnline(online); markDirty(); pollStatus(); pollLive(); pollSessions(); pollLog();
 }
 $('#lang').addEventListener('click', e => { const b = e.target.closest('button'); if(b && b.dataset.l!==LANG) setLang(b.dataset.l); });
+
+/* ---------- temperature unit ----------
+   Every value from the API is °C. The console's "temp_unit" setting only changes what is shown:
+   absolute temperatures convert with ×1.8+32, differences and rates with ×1.8. */
+let UNIT = 'c', ready = false;
+const TSYM = () => UNIT==='f' ? '°F' : '°C';
+const bad = v => v===null || v===undefined || Number.isNaN(v);
+const TA = c => bad(c) ? c : (UNIT==='f' ? c*1.8+32 : c);
+const TD = c => bad(c) ? c : (UNIT==='f' ? c*1.8 : c);
+function setUnit(u){
+  u = u==='f' ? 'f' : 'c';
+  if(u===UNIT) return;
+  UNIT = u; applyStatic();
+  if(ready){ pollLive(); pollSessions(); }
+}
 
 /* ---------- helpers ---------- */
 const VK = {"-1":"na","0":"ok","1":"watch","2":"clean","3":"service"};
 const vk = v => VK[String(v)] || 'na', vt = v => t('b_' + vk(v));
-const num = (v,d=0,u='') => (v===null||v===undefined||Number.isNaN(v)) ? '–' : v.toFixed(d)+u;
+const num = (v,d=0,u='') => bad(v) ? '–' : v.toFixed(d)+u;
 // Turkish writes the percent sign first: 38% / %38
-const pct = v => (v===null||v===undefined||Number.isNaN(v)) ? '–' : (LANG==='tr' ? '%'+v.toFixed(0) : v.toFixed(0)+'%');
+const pct = v => bad(v) ? '–' : (LANG==='tr' ? '%'+v.toFixed(0) : v.toFixed(0)+'%');
 const tfmt = ms => new Date(ms).toLocaleString(locale(),{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
 const hm = ms => new Date(ms).toLocaleTimeString(locale(),{hour:'2-digit',minute:'2-digit'});
 const dur = s => { const h=Math.floor(s/3600), m=Math.floor((s%3600)/60); return h ? `${h} ${t('h')} ${m} ${t('min')}` : `${m} ${t('min')}`; };
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function J(url, opt){ const r = await fetch(url, opt); if(!r.ok) throw new Error('HTTP '+r.status); const x = await r.text(); try{ return JSON.parse(x);}catch(e){ return x; } }
+// config.ini text -> {key: value}
+function parseIni(txt){ const o = {}; String(txt).split(/\r?\n/).forEach(l => { const m = l.match(/^\s*([a-z_0-9]+)\s*=\s*(.*?)\s*$/); if(m) o[m[1]] = m[2]; }); return o; }
 let rangeMin = 30, online = false;
 
 function setOnline(ok){ online = ok; const p = $('#conn'); p.textContent = t(ok ? 'connected' : 'offline'); p.className = 'pill ' + (ok ? 'on' : 'off'); }
+
+/* ---------- tabs ---------- */
+function showTab(){
+  const tab = location.hash==='#settings' ? 'settings' : 'overview';
+  $('#tab-overview').hidden = tab!=='overview';
+  $('#tab-settings').hidden = tab!=='settings';
+  document.querySelectorAll('#tabs a').forEach(a => a.classList.toggle('on', a.dataset.tab===tab));
+  // charts drawn while hidden have no width, so draw them again when the tab shows
+  if(tab==='overview' && ready){ pollLive(); pollSessions(); }
+  if(tab==='settings') pollLog();
+}
+window.addEventListener('hashchange', showTab);
 
 /* ---------- chart ---------- */
 function autoRange(series, hint){
@@ -294,11 +449,12 @@ function drawChart(cv, cfg){
 
 /* ---------- status ---------- */
 function showStatus(d){
-  const n = d.now;
+  setUnit(d.temp_unit);
+  const n = d.now, u = TSYM();
   $('#hdr-meta').textContent = t('hdr_meta', d.version, d.fw, d.ip, dur(d.uptime_s), d.history_n);
-  $('#s-soc').textContent = num(n.soc_c); $('#s-cpu').textContent = num(n.cpu_c);
-  $('#s-gpu-sub').textContent = t('gpu_side') + num(n.gpu_c,0,'°C');
-  $('#s-soc-sub').textContent = t('channels') + (n.soc_raw||[]).map(v=>v==null?'–':v.toFixed(0)).join(' ');
+  $('#s-soc').textContent = num(TA(n.soc_c)); $('#s-cpu').textContent = num(TA(n.cpu_c));
+  $('#s-gpu-sub').textContent = t('gpu_side') + num(TA(n.gpu_c),0,u);
+  $('#s-soc-sub').textContent = t('channels') + (n.soc_raw||[]).map(v=>v==null?'–':TA(v).toFixed(0)).join(' ');
   $('#s-fan').textContent = num(n.fan_pct); $('#s-fan-sub').textContent = t('raw') + num(n.fan_raw) + ' / 1024';
   $('#s-pw').textContent = num(n.power_w);
   $('#s-pw-sub').textContent = `GPU ${num(n.gpu_w)} · CPU ${num(n.cpu_w)}${n.cpu_live?'':'*'} · RAM ${num(n.mem_w)}` + (n.cpu_live?'':t('cpu_not_live'));
@@ -310,8 +466,8 @@ function showStatus(d){
   if(s.active && s.live){
     $('#live-card').style.display=''; const L=s.live;
     $('#live-sum').innerHTML = [
-      [t('ls_soc'), num(L.ss_soc,0,'°C')], [t('ls_fan'), pct(L.ss_fan)], [t('ls_power'), num(L.ss_power,0,' W')], ['FPS', num(L.ss_fps,0)],
-      [t('ls_maxsoc'), num(L.max_soc,0,'°C')], [t('ls_warm'), L.warm_rate==null?'–':num(L.warm_rate,1,t('per_min'))], ['CDI', num(L.cdi,1)],
+      [t('ls_soc'), num(TA(L.ss_soc),0,u)], [t('ls_fan'), pct(L.ss_fan)], [t('ls_power'), num(L.ss_power,0,' W')], ['FPS', num(L.ss_fps,0)],
+      [t('ls_maxsoc'), num(TA(L.max_soc),0,u)], [t('ls_warm'), bad(L.warm_rate)?'–':num(TD(L.warm_rate),1,t('per_min',u))], ['CDI', num(TA(L.cdi),1)],
       [t('ls_verdict'), `<span class="badge ${vk(s.live_verdict)}">${vt(s.live_verdict)}</span>`]
     ].map(([k,v])=>`<div><span class="muted">${esc(k)}</span><b>${v}</b></div>`).join('');
     $('#live-reason').textContent = s.live_reason;
@@ -325,10 +481,10 @@ function showStatus(d){
   $('#r-rel').textContent = t('baseline') + o.reason_rel;
   $('#r-trend').textContent = o.trend_text;
   $('#v-advice').textContent = o.advice;
-  const b = o.baseline;
+  const b = o.baseline, sg = v => (v>=0?'+':'') + v.toFixed(1);
   $('#v-meta').innerHTML = [
-    b.valid ? t('m_base_ok', b.n, b.cdi_mean.toFixed(1), b.cdi_sd.toFixed(1)) : t('m_base_need', b.n, b.need),
-    o.recent_n ? t('m_recent', o.recent_n, o.recent_cdi.toFixed(1), (o.drift>=0?'+':'') + o.drift.toFixed(1)) : '',
+    b.valid ? t('m_base_ok', b.n, TA(b.cdi_mean).toFixed(1), TD(b.cdi_sd).toFixed(1)) : t('m_base_need', b.n, b.need),
+    o.recent_n ? t('m_recent', o.recent_n, TA(o.recent_cdi).toFixed(1), sg(TD(o.drift))) : '',
     o.last ? t('m_last', o.last.title, tfmt(o.last.start_ms)) : '',
     d.epoch_since_ms ? t('m_epoch_since', d.epoch, tfmt(d.epoch_since_ms)) : t('m_epoch', d.epoch)
   ].filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join('');
@@ -342,10 +498,10 @@ async function pollLive(){
   try{
     const step = rangeMin<=10 ? 2 : rangeMin<=30 ? 5 : 15;
     const d = await J(`/api/live?minutes=${rangeMin}&step=${step}`);
-    const pts = f => d.t.map((x,i)=>[x, d[f][i]]);
+    const pts = (f, conv) => d.t.map((x,i)=>[x, conv ? conv(d[f][i]) : d[f][i]]);
     const xb=[]; let s=null; for(let i=0;i<d.t.length;i++){ if(d.game[i]&&s===null) s=d.t[i]; if((!d.game[i]||i===d.t.length-1)&&s!==null){ xb.push({x0:s,x1:d.t[i],color:'#1a2230'}); s=null; } }
     const now = Date.now(), xmin = now - rangeMin*60000;
-    drawChart($('#c-temp'), {series:[{color:'#ff6b6b',pts:pts('soc')},{color:'#ffb347',pts:pts('cpu')},{color:'#4ea1ff',pts:pts('fan'),axis:'r'}], left:{min:30,max:90}, right:{min:0,max:100}, xfmt:hm, xmin, xmax:now, xbands:xb});
+    drawChart($('#c-temp'), {series:[{color:'#ff6b6b',pts:pts('soc',TA)},{color:'#ffb347',pts:pts('cpu',TA)},{color:'#4ea1ff',pts:pts('fan'),axis:'r'}], left:{min:TA(30),max:TA(90)}, right:{min:0,max:100}, xfmt:hm, xmin, xmax:now, xbands:xb});
     drawChart($('#c-pw'), {series:[{color:'#b388ff',pts:pts('pw')},{color:'#2ecc71',pts:pts('fps'),axis:'r'}], left:{min:0,max:200}, right:{min:0,max:120}, xfmt:hm, xmin, xmax:now, xbands:xb});
   }catch(e){}
 }
@@ -356,41 +512,181 @@ async function pollSessions(){
   try{
     const d = await J('/api/sessions'), st = await J('/api/status?lang=' + LANG);
     const h = d.history, ep = st.epoch, o = st.overall, b = o.baseline;
-    const cfgTxt = await J('/api/config');
-    const g = k => { const m = String(cfgTxt).match(new RegExp('^'+k+'\\s*=\\s*([0-9.]+)','m')); return m ? +m[1] : null; };
-    const wd=g('watch_drift')||4, cd=g('clean_drift')||8, sd=g('service_drift')||14;
+    const c = parseIni(await J('/api/config'));
+    const g = (k, def) => { const v = parseFloat(c[k]); return isFinite(v) ? v : def; };
+    const wd=g('watch_drift',4), cd=g('clean_drift',8), sd=g('service_drift',14);
     const colors={0:'#2ecc71',1:'#f1c40f',2:'#e67e22',3:'#e74c3c'};
-    const pts = h.filter(x=>x.ss_valid && x.cdi!=null && x.epoch===ep).map(x=>[x.start_ms, x.cdi, colors[x.verdict]||'#6c7786']);
+    const pts = h.filter(x=>x.ss_valid && x.cdi!=null && x.epoch===ep).map(x=>[x.start_ms, TA(x.cdi), colors[x.verdict]||'#6c7786']);
     const hl=[], bands=[];
-    if(b.valid){ bands.push({y0:b.cdi_mean-b.cdi_sd,y1:b.cdi_mean+b.cdi_sd,color:'#1b3327'}); hl.push({y:b.cdi_mean,color:'#2ecc71',label:t('lv_base')},{y:b.cdi_mean+wd,color:'#f1c40f',label:t('lv_watch')},{y:b.cdi_mean+cd,color:'#e67e22',label:t('lv_clean')},{y:b.cdi_mean+sd,color:'#e74c3c',label:t('lv_service')}); }
+    if(b.valid){
+      const m = b.cdi_mean;
+      bands.push({y0:TA(m-b.cdi_sd),y1:TA(m+b.cdi_sd),color:'#1b3327'});
+      hl.push({y:TA(m),color:'#2ecc71',label:t('lv_base')},{y:TA(m+wd),color:'#f1c40f',label:t('lv_watch')},{y:TA(m+cd),color:'#e67e22',label:t('lv_clean')},{y:TA(m+sd),color:'#e74c3c',label:t('lv_service')});
+    }
     drawChart($('#c-hist'), {series:[{color:'#4ea1ff',pts,dots:true}], xfmt:ms=>new Date(ms).toLocaleDateString(locale(),{day:'2-digit',month:'2-digit'}), hlines:hl, bands, left:{}});
     $('#hist-meta').textContent = t('hist_meta', h.length, pts.length, ep);
     const tb = $('#t-hist tbody'); tb.innerHTML='';
     for(const x of [...h].reverse()){
       const file = fileName(x);
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${tfmt(x.start_ms)}${x.epoch!==ep?` <span class="muted">${t('old_base')}</span>`:''}</td><td>${esc(x.title)}</td><td>${dur(x.dur_s)}</td><td>${num(x.ss_soc)}</td><td>${num(x.ss_cpu)}</td><td>${pct(x.ss_fan)}</td><td>${num(x.ss_power,0,' W')}</td><td>${num(x.ss_fps)}</td><td>${num(x.max_soc)}</td><td>${x.warm_rate==null?'–':num(x.warm_rate,1)}</td><td>${num(x.cdi,1)}</td><td><span class="badge ${vk(x.ss_valid?x.verdict:-1)}">${vt(x.ss_valid?x.verdict:-1)}</span></td><td>${d.files.includes(file)?`<a href="/api/session?file=${encodeURIComponent(file)}">${t('download')}</a>`:'–'}</td>`;
+      tr.innerHTML = `<td>${tfmt(x.start_ms)}${x.epoch!==ep?` <span class="muted">${t('old_base')}</span>`:''}</td><td>${esc(x.title)}</td><td>${dur(x.dur_s)}</td><td>${num(TA(x.ss_soc))}</td><td>${num(TA(x.ss_cpu))}</td><td>${pct(x.ss_fan)}</td><td>${num(x.ss_power,0,' W')}</td><td>${num(x.ss_fps)}</td><td>${num(TA(x.max_soc))}</td><td>${bad(x.warm_rate)?'–':num(TD(x.warm_rate),1)}</td><td>${num(TA(x.cdi),1)}</td><td><span class="badge ${vk(x.ss_valid?x.verdict:-1)}">${vt(x.ss_valid?x.verdict:-1)}</span></td><td>${d.files.includes(file)?`<a href="/api/session?file=${encodeURIComponent(file)}">${t('download')}</a>`:'–'}</td>`;
       tb.appendChild(tr);
     }
   }catch(e){}
 }
 function fileName(x){ const d=new Date(x.start_ms); const p=n=>String(n).padStart(2,'0'); return `${d.getUTCFullYear()}${p(d.getUTCMonth()+1)}${p(d.getUTCDate())}-${p(d.getUTCHours())}${p(d.getUTCMinutes())}${p(d.getUTCSeconds())}_${x.title}.csv`; }
 
-/* ---------- settings / log ---------- */
-async function loadCfg(){ try{ $('#cfg').value = await J('/api/config'); }catch(e){} }
+/* ---------- settings ----------
+   t: int | float | bool | select. tk marks a temperature: abs = absolute, d = difference,
+   k = weight per fan % or per W (scales like a difference). These are shown in the chosen unit
+   and sent back in °C. Only changed keys are posted; the payload merges them into its config. */
+const SET = [
+  ['g_general', [
+    {k:'lang', t:'select', o:[['auto','o_auto'],['en','','English'],['tr','','Türkçe']]},
+    {k:'temp_unit', t:'select', o:[['c','o_c'],['f','o_f']]},
+    {k:'http_port', t:'int', min:1024, max:65535}]],
+  ['g_notify', [{k:'notify_startup', t:'bool'}, {k:'notify_session', t:'bool'}, {k:'notify_live_warn', t:'bool'}]],
+  ['g_measure', [
+    {k:'sample_ms', t:'int', min:250, max:10000, u:'ms'},
+    {k:'csv_every_s', t:'int', min:1, max:600, u:'s'},
+    {k:'fps_enabled', t:'bool'}, {k:'escalate', t:'bool'}]],
+  ['g_session', [
+    {k:'warmup_s', t:'int', min:60, max:3600, u:'s'},
+    {k:'min_ss_s', t:'int', min:60, max:3600, u:'s'},
+    {k:'min_session_s', t:'int', min:30, max:3600, u:'s'},
+    {k:'keep_sessions', t:'int', min:5, max:500}]],
+  ['g_abs', [
+    {k:'abs_watch_fan', t:'float', min:0, max:100, u:'%'},   {k:'abs_watch_soc', t:'float', min:30, max:130, tk:'abs'},
+    {k:'abs_clean_fan', t:'float', min:0, max:100, u:'%'},   {k:'abs_clean_soc', t:'float', min:30, max:130, tk:'abs'},
+    {k:'abs_service_fan', t:'float', min:0, max:100, u:'%'}, {k:'abs_service_soc', t:'float', min:30, max:130, tk:'abs'},
+    {k:'hot_soc_c', t:'float', min:60, max:130, tk:'abs'}]],
+  ['g_cdi', [
+    {k:'baseline_sessions', t:'int', min:1, max:50},
+    {k:'recent_sessions', t:'int', min:1, max:20},
+    {k:'watch_drift', t:'float', min:0.5, max:50, tk:'d'},
+    {k:'clean_drift', t:'float', min:0.5, max:60, tk:'d'},
+    {k:'service_drift', t:'float', min:0.5, max:80, tk:'d'},
+    {k:'k_fan', t:'float', min:0, max:2, tk:'k', u:'/%'},
+    {k:'k_pow', t:'float', min:0, max:2, tk:'k', u:'/W'}]],
+];
+const FIELDS = SET.flatMap(g => g[1]), FLD = Object.fromEntries(FIELDS.map(f => [f.k, f]));
+const RESTART_KEYS = ['http_port', 'escalate'];
+let CFG = {}, FU = 'c';   // config as loaded (°C), and the unit the form currently shows
+const toU = (c, tk, u) => u!=='f' ? c : tk==='abs' ? c*1.8+32 : c*1.8;
+const fromU = (x, tk, u) => u!=='f' ? x : tk==='abs' ? (x-32)/1.8 : x/1.8;
+const trim0 = (x, d) => String(+x.toFixed(d));
+const decs = (f, u) => f.t==='int' ? 0 : f.tk==='k' ? (u==='f' ? 3 : 2) : f.tk ? (u==='f' ? 1 : 2) : 2;
+const showC = (f, c, u) => bad(c) || !isFinite(c) ? '' : trim0(f.tk ? toU(c, f.tk, u) : c, decs(f, u));
+const ctl = k => document.getElementById('f-' + k);
+const ctlVal = el => el.type==='checkbox' ? (el.checked ? '1' : '0') : el.value.trim();
+
+function buildForm(){
+  const host = $('#set-groups');
+  host.innerHTML = SET.map(([gid, fs]) => `<div class="sgroup"><h3 data-i18n="${gid}"></h3>${I18N.en[gid+'_h'] ? `<p class="hint" data-i18n="${gid}_h"></p>` : ''}` +
+    fs.map(f => {
+      const id = 'f-' + f.k;
+      const input = f.t==='bool' ? `<input type="checkbox" id="${id}">`
+        : f.t==='select' ? `<select id="${id}">${f.o.map(([v, key, txt]) => `<option value="${v}"${key ? ` data-i18n="${key}"` : ''}>${txt || ''}</option>`).join('')}</select>`
+        : `<input type="number" id="${id}" step="${f.t==='int' ? 1 : 'any'}" inputmode="decimal" required>`;
+      return `<div class="srow" data-k="${f.k}"><label class="sl" for="${id}"><b data-i18n="f_${f.k}"></b><small data-i18n="h_${f.k}"></small><code>${f.k}</code></label><div class="sin">${input}<span class="su"></span></div></div>`;
+    }).join('') + '</div>').join('');
+  host.addEventListener('input', markDirty);
+  host.addEventListener('change', e => { if(e.target.id==='f-temp_unit') switchFormUnit(e.target.value); markDirty(); });
+}
+// unit text and limits next to each field, for the unit the form shows
+function formUnits(){
+  for(const f of FIELDS){
+    const row = document.querySelector(`.srow[data-k="${f.k}"]`); if(!row) continue;
+    const sym = FU==='f' ? '°F' : '°C';
+    row.querySelector('.su').textContent = f.tk ? (f.tk==='k' ? sym + f.u : sym) : f.u==='s' ? t('u_s') : (f.u || '');
+    const el = ctl(f.k);
+    if(el.type==='number'){
+      el.min = f.tk ? trim0(toU(f.min, f.tk, FU), 3) : f.min;
+      el.max = f.tk ? trim0(toU(f.max, f.tk, FU), 3) : f.max;
+    }
+  }
+}
+function fillForm(){
+  FU = CFG.temp_unit==='f' ? 'f' : 'c';
+  for(const f of FIELDS){
+    const el = ctl(f.k), raw = CFG[f.k];
+    if(raw===undefined){ el.closest('.srow').hidden = true; continue; }   // key unknown to this payload
+    el.closest('.srow').hidden = false;
+    if(f.t==='bool') el.checked = raw!=='0';
+    else if(f.t==='select') el.value = raw.toLowerCase();
+    else el.value = showC(f, parseFloat(raw), FU);
+    el.dataset.init = ctlVal(el);
+  }
+  formUnits();
+  document.querySelectorAll('.srow.bad').forEach(r => r.classList.remove('bad'));
+}
+// the °C value a temperature field holds now (unchanged fields keep the exact saved value)
+function fieldC(f){
+  const el = ctl(f.k);
+  if(ctlVal(el)===el.dataset.init) return parseFloat(CFG[f.k]);
+  const x = parseFloat(el.value);
+  return isFinite(x) ? fromU(x, f.tk, FU) : NaN;
+}
+function switchFormUnit(u){
+  u = u==='f' ? 'f' : 'c'; if(u===FU) return;
+  for(const f of FIELDS){
+    if(!f.tk || CFG[f.k]===undefined) continue;
+    const el = ctl(f.k), c = fieldC(f);
+    el.dataset.init = showC(f, parseFloat(CFG[f.k]), u);
+    if(isFinite(c)) el.value = showC(f, c, u);
+  }
+  FU = u; formUnits();
+}
+function changedKeys(){ return FIELDS.filter(f => CFG[f.k]!==undefined && ctlVal(ctl(f.k))!==ctl(f.k).dataset.init).map(f => f.k); }
+function markDirty(){
+  const ch = changedKeys();
+  document.querySelectorAll('.srow').forEach(r => r.classList.toggle('dirty', ch.includes(r.dataset.k)));
+  $('#b-save').disabled = $('#b-discard').disabled = !ch.length;
+  if(ch.length) $('#cfg-msg').textContent = t('unsaved', ch.length);
+  else if($('#cfg-msg').dataset.keep!=='1') $('#cfg-msg').textContent = '';
+}
+async function loadCfg(){
+  try{ CFG = parseIni(await J('/api/config')); fillForm(); markDirty(); }catch(e){ $('#cfg-msg').textContent = t('error') + e.message; }
+}
+async function saveCfg(){
+  const ch = changedKeys(); if(!ch.length) return;
+  const invalid = ch.filter(k => FLD[k].t==='int' || FLD[k].t==='float').filter(k => !ctl(k).checkValidity() || !isFinite(parseFloat(ctl(k).value)));
+  document.querySelectorAll('.srow').forEach(r => r.classList.toggle('bad', invalid.includes(r.dataset.k)));
+  if(invalid.length){ $('#cfg-msg').textContent = t('check_fields'); ctl(invalid[0]).focus(); return; }
+  const lines = ch.map(k => {
+    const f = FLD[k], v = ctlVal(ctl(k));
+    if(f.tk) return `${k} = ${fromU(parseFloat(v), f.tk, FU).toFixed(3)}`;
+    if(f.t==='int') return `${k} = ${Math.round(parseFloat(v))}`;
+    return `${k} = ${v}`;
+  });
+  const msg = $('#cfg-msg'); msg.textContent = t('saving');
+  $('#b-save').disabled = true;
+  try{
+    const r = await J('/api/config', {method:'POST', body:lines.join('\n') + '\n'});
+    await loadCfg();
+    msg.textContent = (r && r.bad_lines ? t('saved_bad', r.bad_lines) : t('saved')) + (ch.some(k => RESTART_KEYS.includes(k)) ? t('restart_note') : '');
+    msg.dataset.keep = '1';
+    await pollStatus(); pollLog();
+  }catch(e){ msg.textContent = t('error') + e.message; markDirty(); }
+}
+$('#set-form').addEventListener('submit', e => { e.preventDefault(); saveCfg(); });
+$('#b-save').onclick = saveCfg;
+$('#b-discard').onclick = () => { $('#cfg-msg').dataset.keep = ''; loadCfg(); };
+$('#set-groups').addEventListener('input', () => { $('#cfg-msg').dataset.keep = ''; }, true);
+
+/* ---------- maintenance / log ---------- */
 async function pollLog(){ try{ $('#log').textContent = await J('/api/log?lang=' + LANG); }catch(e){} }
-$('#b-save').onclick = async () => { $('#cfg-msg').textContent=t('saving'); try{ const r = await J('/api/config',{method:'POST',body:$('#cfg').value}); $('#cfg-msg').textContent = r.bad_lines ? t('saved_bad', r.bad_lines) : t('saved'); await loadCfg(); pollStatus(); pollLog(); }catch(e){ $('#cfg-msg').textContent=t('error')+e.message; } };
-$('#b-reload').onclick = loadCfg;
-$('#b-notify').onclick = async () => { try{ await J('/api/notify/test',{method:'POST'}); }catch(e){} };
+$('#b-notify').onclick = async () => { try{ await J('/api/notify/test',{method:'POST'}); $('#maint-msg').textContent = t('sent'); }catch(e){ $('#maint-msg').textContent = t('error') + e.message; } };
 $('#b-baseline').onclick = async () => {
   if(!confirm(t('confirm_base'))) return;
-  try{ await J('/api/baseline/reset',{method:'POST'}); pollStatus(); pollSessions(); }catch(e){}
+  try{ await J('/api/baseline/reset',{method:'POST'}); $('#maint-msg').textContent = t('base_done'); pollStatus(); pollSessions(); pollLog(); }catch(e){ $('#maint-msg').textContent = t('error') + e.message; }
 };
 
-applyStatic(); setOnline(false);
-pollStatus(); pollLive(); pollSessions(); loadCfg(); pollLog();
+buildForm(); applyStatic(); setOnline(false); showTab();
+pollStatus().finally(() => { ready = true; pollLive(); pollSessions(); });
+loadCfg(); pollLog();
 setInterval(pollStatus, 2000); setInterval(pollLive, 10000); setInterval(pollSessions, 60000); setInterval(pollLog, 15000);
-window.addEventListener('resize', ()=>{ pollLive(); pollSessions(); });
+window.addEventListener('resize', () => { if(!$('#tab-overview').hidden){ pollLive(); pollSessions(); } });
 </script>
 </body>
 </html>

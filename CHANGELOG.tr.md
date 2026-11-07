@@ -4,6 +4,18 @@
 
 İndirmeler [Releases](https://github.com/Jlozde/PS5-Thermal-Doctor/releases) sayfasındadır.
 
+## 0.2.1 (2026-11-07)
+
+### Eklenenler
+- Web arayüzünde **Ayarlar sekmesi**. Her ayarın kısa açıklamalı kendi alanı var; genel, PS5 bildirimleri, ölçüm, oturumlar, karar eşikleri ve referans karşılaştırması olarak gruplanmış. Değişiklikler kaydedilene kadar işaretli kalır ve geri alınabilir. Aralık dışı değerler kaydetmeden önce gösterilir.
+- **Sıcaklık birimi:** `temp_unit = c | f`. Varsayılan Celsius; Fahrenheit web arayüzünü ve PS5 bildirimlerini değiştirir. Değerler, eşikler ve günlük °C kalır.
+- `/api/status` içinde `temp_unit` alanı.
+
+### Değişenler
+- Web arayüzünde iki sekme var: Genel bakış ve Ayarlar. Bakım işlemleri ve günlük Ayarlar sekmesine taşındı.
+- Ham `config.ini` metin kutusu web arayüzünden kaldırıldı. Dosya yine elle düzenlenebilir.
+- Web arayüzünden kayıt yalnızca değişen anahtarları gönderir; payload bunları kendi ayarlarıyla birleştirir.
+
 ## 0.2.0 (2026-11-07)
 
 ### Eklenenler

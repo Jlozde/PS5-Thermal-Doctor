@@ -2,7 +2,7 @@
 
 [English](ANALYSIS.md) · **Türkçe**
 
-Bu belge `src/analysis.c`'nin ne yaptığını ve neden böyle yaptığını anlatır. Tüm eşikler `config.ini`'den değiştirilebilir.
+Bu belge `src/analysis.c`'nin ne yaptığını ve neden böyle yaptığını anlatır. Tüm eşikler web arayüzünün Ayarlar sekmesinden ya da `config.ini`'den değiştirilebilir.
 
 ## Fizik
 
@@ -84,6 +84,8 @@ PS5 ısınınca FPS düşürmez: fanı açar, yetmezse kapanır. FPS burada yaln
 ## Metinlerin dili
 
 Tüm gerekçe, etiket ve öneriler aynı anda hem İngilizce hem Türkçe üretilir (`an_overall` ikisini de doldurur). API, `?lang=` ile istenen dili döndürür. Bildirimler ve günlük `lang` ayarını kullanır.
+
+Metinlerdeki sıcaklıklar `temp_unit` ayarını izler: varsayılan °C, seçilirse °F. Yalnızca metin değişir. Ölçümler, CDI ve tüm eşikler °C olarak saklanır ve karşılaştırılır. Mutlak değerler ×1,8 + 32, farklar (sapma, eğilim, ısınma hızı) ×1,8 ile dönüştürülür. Günlük her zaman °C kalır.
 
 ## Bilinen sınırlar
 

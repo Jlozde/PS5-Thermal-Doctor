@@ -159,14 +159,15 @@ session_end(const char *end_en, const char *end_tr) {
       int final_v = ov.verdict != VERDICT_NA ? ov.verdict : sum.verdict;
       char pw[24] = "";
       if(sum.power_valid) snprintf(pw, sizeof(pw), " · %.0f W", (double)sum.ss_power);
-      plat_notify(LNG("%s\n%s · %u min · SoC %.0f°C · Fan %.0f%%%s\n%s",
-                      "%s\n%s · %u dk · SoC %.0f°C · Fan %%%.0f%s\n%s"),
-                  PS5TD_NAME, sum.title, sum.dur_s / 60, (double)sum.ss_soc, (double)sum.ss_fan,
-                  pw, an_verdict_label(final_v, i18n_get()));
+      plat_notify(LNG("%s\n%s · %u min · SoC %.0f%s · Fan %.0f%%%s\n%s",
+                      "%s\n%s · %u dk · SoC %.0f%s · Fan %%%.0f%s\n%s"),
+                  PS5TD_NAME, sum.title, sum.dur_s / 60, i18n_temp(sum.ss_soc, g_cfg.temp_unit),
+                  i18n_unit_sym(g_cfg.temp_unit), (double)sum.ss_fan, pw, an_verdict_label(final_v, i18n_get()));
     } else {
-      plat_notify(LNG("%s\n%s · %u min · peak SoC %.0f°C\nPlay longer for a steady measurement.",
-                      "%s\n%s · %u dk · en yüksek SoC %.0f°C\nKararlı ölçüm için daha uzun oynayın."),
-                  PS5TD_NAME, sum.title, sum.dur_s / 60, (double)sum.max_soc);
+      plat_notify(LNG("%s\n%s · %u min · peak SoC %.0f%s\nPlay longer for a steady measurement.",
+                      "%s\n%s · %u dk · en yüksek SoC %.0f%s\nKararlı ölçüm için daha uzun oynayın."),
+                  PS5TD_NAME, sum.title, sum.dur_s / 60, i18n_temp(sum.max_soc, g_cfg.temp_unit),
+                  i18n_unit_sym(g_cfg.temp_unit));
     }
   }
 }
@@ -190,9 +191,10 @@ session_live_update(const sample_t *s) {
 
   if(v == VERDICT_SERVICE && g_cfg.notify_live_warn && !g_live_warned) {
     g_live_warned = 1;
-    plat_notify(LNG("%s - Warning\nSoC %.0f°C, fan %.0f%%: cooling looks insufficient.",
-                    "%s - Uyarı\nSoC %.0f°C, fan %%%.0f: soğutma yetersiz görünüyor."),
-                PS5TD_NAME, (double)sum.ss_soc, (double)sum.ss_fan);
+    plat_notify(LNG("%s - Warning\nSoC %.0f%s, fan %.0f%%: cooling looks insufficient.",
+                    "%s - Uyarı\nSoC %.0f%s, fan %%%.0f: soğutma yetersiz görünüyor."),
+                PS5TD_NAME, i18n_temp(sum.ss_soc, g_cfg.temp_unit), i18n_unit_sym(g_cfg.temp_unit),
+                (double)sum.ss_fan);
   }
 }
 

@@ -26,12 +26,19 @@ CONSOLE_LANG = "tr" if os.environ.get("PS5TD_LANG", "en").lower().startswith("tr
 T0 = time.time()
 random.seed(7)
 
-CFG = dict(lang="auto", http_port=PORT, sample_ms=1000, csv_every_s=5, fps_enabled=1, escalate=1, notify_startup=1,
-           notify_session=1, notify_live_warn=1, warmup_s=600, min_ss_s=300, min_session_s=180,
-           k_fan=0.30, k_pow=0.25, watch_drift=4, clean_drift=8, service_drift=14,
-           abs_watch_fan=60, abs_watch_soc=76, abs_clean_fan=70, abs_clean_soc=80,
-           abs_service_fan=85, abs_service_soc=86, hot_soc_c=95, baseline_sessions=5,
+CFG = dict(lang="auto", temp_unit="c", http_port=PORT, sample_ms=1000, csv_every_s=5, fps_enabled=1, escalate=1,
+           notify_startup=1, notify_session=1, notify_live_warn=1, warmup_s=600, min_ss_s=300, min_session_s=180,
+           k_fan=0.30, k_pow=0.25, watch_drift=4.0, clean_drift=8.0, service_drift=14.0,
+           abs_watch_fan=60.0, abs_watch_soc=76.0, abs_clean_fan=70.0, abs_clean_soc=80.0,
+           abs_service_fan=85.0, abs_service_soc=86.0, hot_soc_c=95.0, baseline_sessions=5,
            recent_sessions=3, keep_sessions=60)
+# Same limits as config_sanitize() in src/config.c / src/config.c içindeki config_sanitize() ile aynı sınırlar
+LIMITS = dict(http_port=(1024, 65535), sample_ms=(250, 10000), csv_every_s=(1, 600), warmup_s=(60, 3600),
+              min_ss_s=(60, 3600), min_session_s=(30, 3600), k_fan=(0, 2), k_pow=(0, 2), watch_drift=(0.5, 50),
+              clean_drift=(0.5, 60), service_drift=(0.5, 80), abs_watch_fan=(0, 100), abs_clean_fan=(0, 100),
+              abs_service_fan=(0, 100), abs_watch_soc=(30, 130), abs_clean_soc=(30, 130), abs_service_soc=(30, 130),
+              hot_soc_c=(60, 130), baseline_sessions=(1, 50), recent_sessions=(1, 20), keep_sessions=(5, 500))
+BOOLS = ("fps_enabled", "escalate", "notify_startup", "notify_session", "notify_live_warn")
 EPOCH = 0
 LOG = []  # (time, en, tr)
 
@@ -49,6 +56,26 @@ def log(en, tr):
     LOG.append((time.strftime("%Y-%m-%d %H:%M:%S "), en, tr))
     del LOG[:-128]
     print(time.strftime("%H:%M:%S ") + L(console_lang(), en, tr), flush=True)
+
+
+def sanitize():
+    for k, (lo, hi) in LIMITS.items():
+        CFG[k] = type(CFG[k])(min(max(CFG[k], lo), hi))
+    CFG["clean_drift"] = max(CFG["clean_drift"], CFG["watch_drift"])
+    CFG["service_drift"] = max(CFG["service_drift"], CFG["clean_drift"])
+    for k in BOOLS:
+        CFG[k] = 1 if CFG[k] else 0
+
+
+def parse_unit(v):
+    v = v.strip().lower()
+    return "c" if v in ("c", "celsius") else "f" if v in ("f", "fahrenheit") else None
+
+
+# Values stay in °C; texts follow temp_unit / Değerler °C kalır, metinler temp_unit'i izler
+def tc(v): return v * 1.8 + 32 if CFG["temp_unit"] == "f" else v
+def td(v): return v * 1.8 if CFG["temp_unit"] == "f" else v
+def tsym(): return "°F" if CFG["temp_unit"] == "f" else "°C"
 
 
 def pct(lang, v):
@@ -74,17 +101,18 @@ def abs_reason(lang, soc, fan, pw):
     """Same wording as an_verdict_abs() in src/analysis.c."""
     v = verdict_abs(soc, fan)
     f = pct(lang, fan)
+    s = f"{tc(soc):.0f}{tsym()}"
     if v == 3:
-        return L(lang, f"Fan at {f} and SoC still {soc:.0f}°C: cooling is insufficient.",
-                       f"Fan {f}'de çalışırken SoC {soc:.0f}°C: soğutma yetersiz.")
+        return L(lang, f"Fan at {f} and SoC still {s}: cooling is insufficient.",
+                       f"Fan {f}'de çalışırken SoC {s}: soğutma yetersiz.")
     if v == 2:
-        return L(lang, f"Fan {f} and SoC {soc:.0f}°C: the fan struggles to hold the temperature at high speed.",
-                       f"Fan {f} ve SoC {soc:.0f}°C: fan yüksek devirde sıcaklığı zor tutuyor.")
+        return L(lang, f"Fan {f} and SoC {s}: the fan struggles to hold the temperature at high speed.",
+                       f"Fan {f} ve SoC {s}: fan yüksek devirde sıcaklığı zor tutuyor.")
     if v == 1:
-        return L(lang, f"Fan {f} and SoC {soc:.0f}°C: slightly above normal.",
-                       f"Fan {f} ve SoC {soc:.0f}°C: normalin biraz üstünde.")
-    return L(lang, f"SoC {soc:.0f}°C, fan {f}, {pw:.0f} W: values are in the normal range.",
-                   f"SoC {soc:.0f}°C, fan {f}, {pw:.0f} W: değerler normal aralıkta.")
+        return L(lang, f"Fan {f} and SoC {s}: slightly above normal.",
+                       f"Fan {f} ve SoC {s}: normalin biraz üstünde.")
+    return L(lang, f"SoC {s}, fan {f}, {pw:.0f} W: values are in the normal range.",
+                   f"SoC {s}, fan {f}, {pw:.0f} W: değerler normal aralıkta.")
 
 
 NAMES = {-1: "NO_DATA", 0: "OK", 1: "WATCH", 2: "CLEAN", 3: "SERVICE"}
@@ -153,15 +181,16 @@ def overall(lang):
     else:
         reason_abs = L(lang, "No recorded session yet.", "Henüz kayıtlı oturum yok.")
     if bv:
-        reason_rel = L(lang, f"Cooling index {drift:+.1f}°C vs. baseline (baseline {mean:.1f} ± {sd:.1f}, last {len(recent)} sessions {rc:.1f}).",
-                             f"Soğutma indeksi referansa göre {drift:+.1f}°C (referans {mean:.1f} ± {sd:.1f}, son {len(recent)} oturum {rc:.1f}).")
+        d, m, e, r, u = td(drift), tc(mean), td(sd), tc(rc), tsym()
+        reason_rel = L(lang, f"Cooling index {d:+.1f}{u} vs. baseline (baseline {m:.1f} ± {e:.1f}, last {len(recent)} sessions {r:.1f}).",
+                             f"Soğutma indeksi referansa göre {d:+.1f}{u} (referans {m:.1f} ± {e:.1f}, son {len(recent)} oturum {r:.1f}).")
     else:
         reason_rel = L(lang, f"Building the baseline: {len(base)}/{CFG['baseline_sessions']} sessions. Play a few more games.",
                              f"Referans oluşuyor: {len(base)}/{CFG['baseline_sessions']} oturum. Birkaç oyun daha oynayın.")
     if trend_valid:
         worse = L(lang, " Cooling is getting worse over time.", " Soğutma zamanla kötüleşiyor.") if slope >= 2 else ""
-        trend = L(lang, f"Trend over {len(hs)} sessions: {slope:+.1f}°C per 30 days.{worse}",
-                        f"Eğilim: {len(hs)} oturum üzerinden {slope:+.1f}°C / 30 gün.{worse}")
+        trend = L(lang, f"Trend over {len(hs)} sessions: {td(slope):+.1f}{tsym()} per 30 days.{worse}",
+                        f"Eğilim: {len(hs)} oturum üzerinden {td(slope):+.1f}{tsym()} / 30 gün.{worse}")
     else:
         trend = L(lang, "Not enough data for a trend (needs at least 6 sessions over 14 days).",
                         "Eğilim için yeterli veri yok (en az 6 oturum ve 14 gün).")
@@ -262,8 +291,8 @@ class H(BaseHTTPRequestHandler):
             ok = L(lang, "ok", "var")
             symbols = (f"CpuTemp:{ok} SocSensor:{ok} FanDuty:{ok} SocPower:{ok} BigApp:{ok} SysLang:{ok} "
                        + L(lang, f"(SIMULATION: {MODE})", f"(SİMÜLASYON: {MODE})"))
-            return self._json(dict(app="ps5td", version="0.2.0-sim", pid=os.getpid(), fw="11.60", ip="127.0.0.1",
-                                   uptime_s=int(time.time() - T0), lang=lang, console_lang=console_lang(), config_lang=CFG["lang"],
+            return self._json(dict(app="ps5td", version="0.2.1-sim", pid=os.getpid(), fw="11.60", ip="127.0.0.1",
+                                   uptime_s=int(time.time() - T0), lang=lang, console_lang=console_lang(), config_lang=CFG["lang"], temp_unit=CFG["temp_unit"],
                                    symbols=symbols, dce=L(lang, "reading the flip counter", "flip sayacı okunuyor"),
                                    samples_total=len(RING), history_n=len(HIST), epoch=EPOCH, epoch_since_ms=0, now=RING[-1],
                                    session=dict(active=True, title="PPSA01234", dur_s=int(time.time() - SESSION_START), live=live,
@@ -278,7 +307,8 @@ class H(BaseHTTPRequestHandler):
         if u.path == "/api/sessions":
             return self._json(dict(history=HIST, files=[]))
         if u.path == "/api/config":
-            txt = "# PS5 Thermal Doctor (simulation / simülasyon)\n\n" + "".join(f"{k} = {v}\n" for k, v in CFG.items())
+            txt = "# PS5 Thermal Doctor (simulation / simülasyon)\n\n" + "".join(
+                f"{k} = {v:.2f}\n" if isinstance(v, float) else f"{k} = {v}\n" for k, v in CFG.items())
             return self._send(200, "text/plain; charset=utf-8", txt)
         if u.path == "/api/log":
             lang = query_lang(q)
@@ -299,10 +329,14 @@ class H(BaseHTTPRequestHandler):
                 if k == "lang":
                     if v.lower() in ("auto", "en", "tr"): CFG["lang"] = v.lower()
                     else: bad += 1
+                elif k == "temp_unit":
+                    if parse_unit(v): CFG["temp_unit"] = parse_unit(v)
+                    else: bad += 1
                 elif k in CFG:
                     try: CFG[k] = type(CFG[k])(float(v))
                     except ValueError: bad += 1
                 else: bad += 1
+            sanitize()
             log(f"Settings updated ({bad} bad lines).", f"Ayarlar güncellendi ({bad} hatalı satır).")
             return self._json(dict(ok=True, bad_lines=bad))
         if u.path == "/api/baseline/reset":

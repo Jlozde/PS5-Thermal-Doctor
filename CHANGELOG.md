@@ -4,6 +4,18 @@
 
 Downloads are on the [Releases](https://github.com/Jlozde/PS5-Thermal-Doctor/releases) page.
 
+## 0.2.1 (2026-11-07)
+
+### Added
+- **Settings tab** in the web UI. Every option has its own field with a short explanation, grouped as general, PS5 notifications, measurement, sessions, verdict thresholds and baseline comparison. Changes are marked until saved and can be discarded. Out-of-range values are flagged before saving.
+- **Temperature unit:** `temp_unit = c | f`. Celsius is the default; Fahrenheit changes the web UI and the PS5 notifications. Values, thresholds and the log stay in °C.
+- `temp_unit` field in `/api/status`.
+
+### Changed
+- The web UI has two tabs: Overview and Settings. Maintenance actions and the log moved to the Settings tab.
+- The raw `config.ini` text box was removed from the web UI. The file can still be edited by hand.
+- Saving from the web UI sends only the changed keys; the payload merges them into its settings.
+
 ## 0.2.0 (2026-11-07)
 
 ### Added
