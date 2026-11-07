@@ -13,6 +13,7 @@
 - `/api/status` ve `/api/log` için `?lang=`, ayrıca `lang`, `console_lang`, `config_lang` ve `overall.badge` alanları.
 - Release iş akışı: `v*` etiketi gönderilince ELF derlenir ve GitHub Release yayınlanır.
 - README'de ekran görüntüleri ve "nasıl çalışır" diyagramı.
+- README'de, sürüm notunda ve web arayüzünün alt kısmında sorumluluk reddi: kararlar tahmindir, garanti değildir.
 
 ### Değişenler
 - API'deki karar kodları İngilizce: `OK`, `WATCH`, `CLEAN`, `SERVICE`, `NO_DATA`.

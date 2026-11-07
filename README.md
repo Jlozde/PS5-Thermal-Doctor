@@ -16,6 +16,13 @@ PS5 Thermal Doctor is a background payload for jailbroken PS5 consoles. While yo
 
 > **Note:** It does not run on a normal (non-jailbroken) PS5. It needs firmware 4.03–14.10 and the etaHEN / elfldr loader.
 
+> [!IMPORTANT]
+> **Disclaimer.** PS5 Thermal Doctor gives an estimate, not a diagnosis, and does not claim to be 100% accurate. It cannot look inside the console: it infers the state of the cooling from sensor readings and from thresholds that are still being tuned.
+>
+> - **A healthy result is not a guarantee.** A console shown as OK can still have a problem, such as dust building up, a worn fan or a degraded thermal interface. Your own checks come first: unusual fan noise, very hot exhaust air, dust visible in the vents, or unexpected shutdowns.
+> - **An unhealthy result deserves quick attention.** If it shows CLEAN or SERVICE, or the console runs very hot, take a break and check the console soon. Cooling problems tend to get worse, and an overheating console can shut down or be damaged.
+> - **Use at your own risk.** Running payloads requires a jailbroken console. The authors are not responsible for damage, data loss or a voided warranty.
+
 ## Why
 
 Dust builds up slowly, over months. A PS5 does not warn you about it: its fan controller simply spins the fan faster to keep the chip at the same temperature. The temperature therefore looks fine for a long time, until the console gets loud, the fan runs flat out and the console finally shuts down to protect itself.

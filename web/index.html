@@ -61,6 +61,7 @@ pre{background:#0f1319;border:1px solid var(--line);border-radius:8px;padding:10
 .live-sum b{display:block;font-size:17px}
 .muted{color:var(--mut)}
 footer{color:var(--mut);font-size:12px;text-align:center;padding:14px}
+footer .disc{max-width:760px;margin:6px auto 0;line-height:1.5}
 </style>
 </head>
 <body>
@@ -137,7 +138,7 @@ footer{color:var(--mut);font-size:12px;text-align:center;padding:14px}
 </section>
 
 </main>
-<footer data-i18n="footer">PS5 Thermal Doctor · GPL-3.0 · data under /data/ps5td</footer>
+<footer><div data-i18n="footer">PS5 Thermal Doctor · GPL-3.0 · data under /data/ps5td</div><div class="disc" data-i18n="disclaimer">These verdicts are estimates, not a guarantee. A healthy result does not rule out a problem, so trust your own checks first. An unhealthy result may need attention right away.</div></footer>
 
 <script>
 const $ = s => document.querySelector(s);
@@ -167,6 +168,7 @@ const I18N = {
     saving:'saving…', saved:'saved', saved_bad:'saved, {0} bad lines skipped', error:'error: ',
     confirm_base:'Start a new baseline?\n\nUse this only after cleaning / servicing the console. Older sessions are kept but left out of the comparison.',
     log:'Log', footer:'PS5 Thermal Doctor · GPL-3.0 · data under /data/ps5td',
+    disclaimer:'These verdicts are estimates, not a guarantee. A healthy result does not rule out a problem, so trust your own checks first. An unhealthy result may need attention right away.',
     h:'h', min:'min',
     b_na:'NO DATA', b_ok:'OK', b_watch:'WATCH', b_clean:'CLEAN', b_service:'SERVICE'
   },
@@ -193,6 +195,7 @@ const I18N = {
     saving:'kaydediliyor…', saved:'kaydedildi', saved_bad:'kaydedildi, {0} hatalı satır atlandı', error:'hata: ',
     confirm_base:'Yeni referans başlatılsın mı?\n\nBunu yalnızca cihazı temizledikten / bakım yaptırdıktan sonra kullanın. Eski oturumlar saklanır ama karşılaştırma dışı kalır.',
     log:'Günlük', footer:'PS5 Thermal Doctor · GPL-3.0 · veriler /data/ps5td altında',
+    disclaimer:'Bu kararlar tahmindir, garanti değildir. Sağlıklı sonuç bir sorunu dışlamaz; önce kendi incelemenize güvenin. Sağlıksız görünen sonuç ise hemen müdahale gerektirebilir.',
     h:'sa', min:'dk',
     b_na:'VERİ YOK', b_ok:'OK', b_watch:'İZLE', b_clean:'TEMİZLİK', b_service:'SERVİS'
   }

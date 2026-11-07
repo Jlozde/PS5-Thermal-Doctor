@@ -13,6 +13,7 @@ Downloads are on the [Releases](https://github.com/Jlozde/PS5-Thermal-Doctor/rel
 - `?lang=` on `/api/status` and `/api/log`, plus the `lang`, `console_lang`, `config_lang` and `overall.badge` fields.
 - Release workflow: pushing a `v*` tag builds the ELF and publishes a GitHub Release.
 - Screenshots and a "how it works" diagram in the README.
+- A disclaimer in the README, the release notes and the web UI footer: verdicts are estimates, not a guarantee.
 
 ### Changed
 - Verdict codes in the API are English: `OK`, `WATCH`, `CLEAN`, `SERVICE`, `NO_DATA`.

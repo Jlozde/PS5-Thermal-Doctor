@@ -16,6 +16,13 @@ PS5 Thermal Doctor, jailbreak'li PS5 için bir arka plan payload'ıdır. Siz oyn
 
 > **Not:** Normal (jailbreak'siz) PS5'te çalışmaz. Firmware 4.03–14.10 arası ve etaHEN / elfldr yükleyicisi gerekir.
 
+> [!IMPORTANT]
+> **Sorumluluk reddi.** PS5 Thermal Doctor bir teşhis değil, tahmin sunar ve %100 doğru olduğunu iddia etmez. Konsolun içini göremez; soğutmanın durumunu sensör okumalarından ve hâlâ ayarlanmakta olan eşiklerden çıkarır.
+>
+> - **Sağlıklı sonuç bir garanti değildir.** OK görünen bir konsolda da biriken toz, yıpranmış fan ya da bozulmuş termal arayüz gibi bir sorun olabilir. Önce kendi incelemeniz gelir: alışılmadık fan sesi, çok sıcak çıkan hava, havalandırmada görünen toz ya da beklenmedik kapanmalar.
+> - **Sağlıksız görünen sonuç hızlı müdahale ister.** TEMİZLİK veya SERVİS görünüyorsa ya da konsol çok ısınıyorsa, oyuna ara verip konsolu kısa sürede kontrol edin. Soğutma sorunları genellikle kötüleşir; aşırı ısınan konsol kapanabilir ya da zarar görebilir.
+> - **Kullanım sorumluluğu size aittir.** Payload çalıştırmak jailbreak'li konsol gerektirir. Yazarlar hasar, veri kaybı veya garanti kaybından sorumlu tutulamaz.
+
 ## Neden
 
 Toz aylar içinde yavaş yavaş birikir. PS5 bu konuda sizi uyarmaz: fan kontrolcüsü çipi aynı sıcaklıkta tutmak için fanı biraz daha hızlandırır. Bu yüzden sıcaklık uzun süre normal görünür; ta ki konsol gürültülü çalışmaya başlayana, fan son hıza çıkana ve sonunda konsol kendini korumak için kapanana kadar.
