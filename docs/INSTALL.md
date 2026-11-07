@@ -28,7 +28,7 @@ powershell -ExecutionPolicy Bypass -File .\tools\build.ps1        # -> ps5-therm
 - `-ShowCommands` prints the commands it runs. `-NoStrip` keeps the symbols; combine it with `-Out build\debug.elf` to write a separate file.
 - The script uses the same flags as the Makefile and the logic of the SDK's `bin/prospero-clang` wrapper. With clang 20+ the driver adds the crt objects itself (`SCE_PROSPERO_SDK_DIR`).
 - If the project is on a network share (`\\server\...`), PowerShell blocks unsigned scripts with "not digitally signed". That is why the `powershell -ExecutionPolicy Bypass -File ...` form is used. A permanent fix is `Set-ExecutionPolicy -Scope CurrentUser Bypass`; that security choice is yours.
-- Tested combination: SDK v0.45 (2026-10-21) + llvm-mingw 20261104 (clang 23.1.5), giving a ~165 KB ELF.
+- Tested combination: SDK v0.45 (2026-10-21) + llvm-mingw 20261104 (clang 23.1.5), giving a ~260 KB ELF.
 
 ## B) GitHub Actions
 
@@ -76,8 +76,9 @@ If the payload is sent a second time, the old instance is stopped automatically:
 
 ## Language
 
-- Web UI: the **EN / TR** buttons in the header.
-- Notifications, log and payload output: `lang = auto | en | tr` in `/data/ps5td/config.ini`, also editable in the Settings tab of the web UI. `auto` follows the PS5 system language.
+- Web UI: the language menu in the header. English, Turkish, German, French, Spanish, Russian, Korean and Simplified Chinese are available.
+- PS5 notifications: `lang = auto | en | tr | de | fr | es | ru | ko | zh` in `/data/ps5td/config.ini`, also editable in the Settings tab of the web UI. `auto` follows the PS5 system language; a language the app does not have falls back to English.
+- The log and payload output are in Turkish when the console language is Turkish, otherwise in English.
 - The startup log prints the chosen language, for example `Language: en (config auto, PS5 system language code 1).`
 
 ## Temperature unit
@@ -99,6 +100,6 @@ Copy the ELF to `/data/etaHEN/payloads/` (FTP on port 1337). In etaHEN Toolbox â
 | Power shows `â€“` | `sceKernelGetSocPowerConsumption` is missing or has an unexpected layout (see the log). |
 | Game shows "none" while a game is open | `sceSystemServiceGetAppIdOfRunningBigApp` does not answer. If the pfsmnt fallback is empty too, share the log. |
 | Web UI does not open | Are you on the same network as the PS5? The port may have been changed in `config.ini`. |
-| Texts in the wrong language | Web UI: use the EN / TR buttons. Notifications: set `lang = en` or `lang = tr`. |
+| Texts in the wrong language | Web UI: use the language menu in the header. Notifications: set **Console language** in the Settings tab (for example `lang = de`). |
 
 Log: `http://<ip>:8088/api/log?lang=en` or `/data/ps5td/ps5td.log`.

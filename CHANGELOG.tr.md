@@ -4,6 +4,19 @@
 
 İndirmeler [Releases](https://github.com/Jlozde/PS5-Thermal-Doctor/releases) sayfasındadır.
 
+## 0.2.2 (2026-11-07)
+
+### Eklenenler
+- **Altı yeni uygulama dili:** İngilizce ve Türkçenin yanına Almanca, Fransızca, İspanyolca, Rusça, Korece ve Basitleştirilmiş Çince. Web arayüzünü, kararları, gerekçeleri, önerileri ve PS5 bildirimlerini kapsar.
+- `config.ini` içinde ve Ayarlar sekmesinde `lang = de | fr | es | ru | ko | zh`. `lang = auto` artık bu PS5 sistem dillerini de tanır; diğer sistem dilleri İngilizce kullanır.
+- Web arayüzünde ve API'de `?lang=` yeni kodları kabul eder.
+- `tools/i18n_texts.py` tüm uygulama metinlerini tek tabloda tutar; `tools/gen_i18n.py` bu tablodan `src/texts.h` dosyasını ve web arayüzü metin tablosunu üretir, her çevirinin İngilizce metinle aynı değerleri aldığını denetler. CI bu denetimi çalıştırır.
+
+### Değişenler
+- Web arayüzü başlığındaki **EN / TR** düğmeleri dil menüsüne dönüştü.
+- Yüzdeler ve süreler seçilen dilin yazımına uyar (Almanca ve Fransızcada `38 %`, Türkçede `%38`).
+- Günlük ve `config.ini` açıklamaları İngilizce ve Türkçe kalır. Başka bir dilde günlük İngilizce gösterilir; Ayarlar sekmesi bunu belirtir.
+
 ## 0.2.1 (2026-11-07)
 
 ### Eklenenler

@@ -21,6 +21,7 @@
  *     compared with it. After cleaning, "New baseline" increments the epoch.
  */
 #include "analysis.h"
+#include "texts.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -111,7 +112,8 @@ add_reason(char *why, size_t n, const char *txt) {
   snprintf(why + used, n - used, "%s", txt);
 }
 
-/* Turkish writes the percent sign before the number ("%38"), English after ("38%").
+/* Texts come from src/texts.h (generated from tools/i18n_texts.py); each language
+   writes the percent sign its own way ("38%", "%38", "38 %").
    Temperatures in texts follow config "temp_unit"; the comparisons stay in °C. */
 static double tc(const config_t *c, double v) { return i18n_temp(v, c->temp_unit); }
 static double td(const config_t *c, double v) { return i18n_tdelta(v, c->temp_unit); }
@@ -121,9 +123,7 @@ int
 an_verdict_abs(const session_summary_t *s, const config_t *c, int lang, char *why, size_t n) {
   why[0] = '\0';
   if(!s->ss_valid) {
-    snprintf(why, n, LNGX(lang, "Not enough steady-state data: at least %u min of continuous play is needed.",
-                                "Kararlı durum verisi yetersiz: en az %u dk kesintisiz oyun gerekli."),
-             (c->warmup_s + c->min_ss_s + 59) / 60);
+    snprintf(why, n, TX_NOT_STEADY(lang), (c->warmup_s + c->min_ss_s + 59) / 60);
     return VERDICT_NA;
   }
   int v = VERDICT_OK;
@@ -132,48 +132,37 @@ an_verdict_abs(const session_summary_t *s, const config_t *c, int lang, char *wh
 
   if(s->danger_s >= 60) {
     v = VERDICT_SERVICE;
-    snprintf(t, sizeof(t), LNGX(lang, "SoC spent %u s at or above %.0f%s.",
-                                      "SoC %u sn boyunca %.0f%s ve üzerinde kaldı."),
-             (unsigned)s->danger_s, tc(c, c->hot_soc_c), tsym(c));
+    snprintf(t, sizeof(t), TX_DANGER(lang), (unsigned)s->danger_s, tc(c, c->hot_soc_c), tsym(c));
     add_reason(why, n, t);
   }
   if(s->ss_fan < 5.0f && s->ss_soc >= 70.0f) {
     v = VERDICT_SERVICE;
-    snprintf(t, sizeof(t), LNGX(lang, "SoC %.0f%s with the fan at %.0f%%: the fan may not be spinning.",
-                                      "SoC %.0f%s iken fan %%%.0f: fan dönmüyor olabilir."), tc(c, soc), tsym(c), fan);
+    snprintf(t, sizeof(t), TX_FAN_STOPPED(lang), tc(c, soc), tsym(c), fan);
     add_reason(why, n, t);
   }
   if(s->ss_fan >= c->abs_service_fan && s->ss_soc >= c->abs_service_soc) {
     v = maxv(v, VERDICT_SERVICE);
-    snprintf(t, sizeof(t), LNGX(lang, "Fan at %.0f%% and SoC still %.0f%s: cooling is insufficient.",
-                                      "Fan %%%.0f'de çalışırken SoC %.0f%s: soğutma yetersiz."), fan, tc(c, soc), tsym(c));
+    snprintf(t, sizeof(t), TX_ABS_SERVICE(lang), fan, tc(c, soc), tsym(c));
     add_reason(why, n, t);
   } else if(s->ss_fan >= c->abs_clean_fan && s->ss_soc >= c->abs_clean_soc) {
     v = maxv(v, VERDICT_CLEAN);
-    snprintf(t, sizeof(t), LNGX(lang, "Fan %.0f%% and SoC %.0f%s: the fan struggles to hold the temperature at high speed.",
-                                      "Fan %%%.0f ve SoC %.0f%s: fan yüksek devirde sıcaklığı zor tutuyor."), fan, tc(c, soc), tsym(c));
+    snprintf(t, sizeof(t), TX_ABS_CLEAN(lang), fan, tc(c, soc), tsym(c));
     add_reason(why, n, t);
   } else if(s->ss_fan >= c->abs_watch_fan && s->ss_soc >= c->abs_watch_soc) {
     v = maxv(v, VERDICT_WATCH);
-    snprintf(t, sizeof(t), LNGX(lang, "Fan %.0f%% and SoC %.0f%s: slightly above normal.",
-                                      "Fan %%%.0f ve SoC %.0f%s: normalin biraz üstünde."), fan, tc(c, soc), tsym(c));
+    snprintf(t, sizeof(t), TX_ABS_WATCH(lang), fan, tc(c, soc), tsym(c));
     add_reason(why, n, t);
   }
   if(s->hot_share >= 0.5f && v < VERDICT_CLEAN) {
     v = VERDICT_CLEAN;
-    snprintf(t, sizeof(t), LNGX(lang, "Fan >= 80%% and SoC >= %.0f%s for %.0f%% of the session.",
-                                      "Fan >= %%80 ve SoC >= %.0f%s durumu oturumun %%%.0f'inde sürdü."),
-             tc(c, 80.0), tsym(c), (double)(s->hot_share * 100.0f));
+    snprintf(t, sizeof(t), TX_HOT_SHARE(lang), tc(c, 80.0), tsym(c), (double)(s->hot_share * 100.0f));
     add_reason(why, n, t);
   }
   if(v == VERDICT_OK) {
     if(s->power_valid)
-      snprintf(why, n, LNGX(lang, "SoC %.0f%s, fan %.0f%%, %.0f W: values are in the normal range.",
-                                  "SoC %.0f%s, fan %%%.0f, %.0f W: değerler normal aralıkta."),
-               tc(c, soc), tsym(c), fan, (double)s->ss_power);
+      snprintf(why, n, TX_OK_POWER(lang), tc(c, soc), tsym(c), fan, (double)s->ss_power);
     else
-      snprintf(why, n, LNGX(lang, "SoC %.0f%s, fan %.0f%%: values are in the normal range.",
-                                  "SoC %.0f%s, fan %%%.0f: değerler normal aralıkta."), tc(c, soc), tsym(c), fan);
+      snprintf(why, n, TX_OK_NOPOWER(lang), tc(c, soc), tsym(c), fan);
   }
   return v;
 }
@@ -241,13 +230,11 @@ an_verdict_rel(float recent_cdi, unsigned recent_n, const baseline_t *b, const c
                int lang, float *drift, char *why, size_t n) {
   *drift = 0.0f;
   if(!b->valid) {
-    snprintf(why, n, LNGX(lang, "Building the baseline: %u/%u sessions. Play a few more games.",
-                                "Referans oluşuyor: %u/%u oturum. Birkaç oyun daha oynayın."), b->n, b->need);
+    snprintf(why, n, TX_BUILDING(lang), b->n, b->need);
     return VERDICT_NA;
   }
   if(recent_n == 0) {
-    snprintf(why, n, "%s", LNGX(lang, "Baseline ready; no newer session to compare yet.",
-                                      "Referans hazır, karşılaştırılacak yeni oturum yok."));
+    snprintf(why, n, "%s", TX_BASE_READY(lang));
     return VERDICT_NA;
   }
   float d = recent_cdi - b->cdi_mean;
@@ -256,9 +243,7 @@ an_verdict_rel(float recent_cdi, unsigned recent_n, const baseline_t *b, const c
         : d >= c->clean_drift   ? VERDICT_CLEAN
         : d >= c->watch_drift   ? VERDICT_WATCH
         : VERDICT_OK;
-  snprintf(why, n, LNGX(lang, "Cooling index %+.1f%s vs. baseline (baseline %.1f ± %.1f, last %u sessions %.1f).",
-                              "Soğutma indeksi referansa göre %+.1f%s (referans %.1f ± %.1f, son %u oturum %.1f)."),
-           td(c, d), tsym(c), tc(c, b->cdi_mean), td(c, b->cdi_sd), recent_n, tc(c, recent_cdi));
+  snprintf(why, n, TX_REL(lang), td(c, d), tsym(c), tc(c, b->cdi_mean), td(c, b->cdi_sd), recent_n, tc(c, recent_cdi));
   return v;
 }
 
@@ -306,9 +291,7 @@ an_overall(const session_summary_t *hist, unsigned n, uint32_t epoch, const conf
     if(o->has_last)
       o->verdict_abs = an_verdict_abs(&o->last, c, l, o->reason_abs[l], AN_REASON_LEN);
     else
-      snprintf(o->reason_abs[l], AN_REASON_LEN,
-               LNGX(l, "No recorded session yet. Start a game and play for at least %u min.",
-                       "Henüz kayıtlı oturum yok. Bir oyun açın ve en az %u dk oynayın."), need_min);
+      snprintf(o->reason_abs[l], AN_REASON_LEN, TX_NO_SESSION(l), need_min);
   }
 
   an_baseline(hist, n, epoch, c, &o->baseline);
@@ -322,15 +305,10 @@ an_overall(const session_summary_t *hist, unsigned n, uint32_t epoch, const conf
   int worse = o->trend_valid && o->trend_per_30d >= 2.0f;
   for(int l = 0; l < LANG_COUNT; l++) {
     if(o->trend_valid)
-      snprintf(o->trend_text[l], AN_REASON_LEN,
-               LNGX(l, "Trend over %u sessions: %+.1f%s per 30 days.%s",
-                       "Eğilim: %u oturum üzerinden %+.1f%s / 30 gün.%s"),
-               tn, td(c, o->trend_per_30d), tsym(c),
-               worse ? LNGX(l, " Cooling is getting worse over time.", " Soğutma zamanla kötüleşiyor.") : "");
+      snprintf(o->trend_text[l], AN_REASON_LEN, TX_TREND(l),
+               tn, td(c, o->trend_per_30d), tsym(c), worse ? TX_TREND_WORSE(l) : "");
     else
-      snprintf(o->trend_text[l], AN_REASON_LEN, "%s",
-               LNGX(l, "Not enough data for a trend (needs at least 6 sessions over 14 days).",
-                       "Eğilim için yeterli veri yok (en az 6 oturum ve 14 gün)."));
+      snprintf(o->trend_text[l], AN_REASON_LEN, "%s", TX_TREND_NONE(l));
   }
 
   int v = VERDICT_NA;
@@ -354,55 +332,32 @@ an_verdict_name(int v) {
 const char *
 an_verdict_badge(int v, int lang) {
   switch(v) {
-    case VERDICT_OK:      return "OK";
-    case VERDICT_WATCH:   return LNGX(lang, "WATCH", "İZLE");
-    case VERDICT_CLEAN:   return LNGX(lang, "CLEAN", "TEMİZLİK");
-    case VERDICT_SERVICE: return LNGX(lang, "SERVICE", "SERVİS");
-    default:              return LNGX(lang, "NO DATA", "VERİ YOK");
+    case VERDICT_OK:      return TX_BADGE_OK(lang);
+    case VERDICT_WATCH:   return TX_BADGE_WATCH(lang);
+    case VERDICT_CLEAN:   return TX_BADGE_CLEAN(lang);
+    case VERDICT_SERVICE: return TX_BADGE_SERVICE(lang);
+    default:              return TX_BADGE_NA(lang);
   }
 }
 
 const char *
 an_verdict_label(int v, int lang) {
   switch(v) {
-    case VERDICT_OK:      return LNGX(lang, "Cooling is normal", "Soğutma normal");
-    case VERDICT_WATCH:   return LNGX(lang, "Slight deviation, keep monitoring", "Hafif sapma, izlemeye devam");
-    case VERDICT_CLEAN:   return LNGX(lang, "Dust cleaning recommended", "Toz temizliği önerilir");
-    case VERDICT_SERVICE: return LNGX(lang, "Cooling insufficient: maintenance needed", "Soğutma yetersiz: bakım gerekli");
-    default:              return LNGX(lang, "Not enough data yet", "Henüz yeterli veri yok");
+    case VERDICT_OK:      return TX_LABEL_OK(lang);
+    case VERDICT_WATCH:   return TX_LABEL_WATCH(lang);
+    case VERDICT_CLEAN:   return TX_LABEL_CLEAN(lang);
+    case VERDICT_SERVICE: return TX_LABEL_SERVICE(lang);
+    default:              return TX_LABEL_NA(lang);
   }
 }
 
 const char *
 an_verdict_advice(int v, int lang) {
   switch(v) {
-    case VERDICT_OK:
-      return LNGX(lang,
-        "No maintenance needed. Keep measuring; the comparison gets more precise as the baseline builds up.",
-        "Bakım gerekmiyor. Ölçüme devam edin; referans oluştukça karşılaştırma hassaslaşır.");
-    case VERDICT_WATCH:
-      return LNGX(lang,
-        "Make sure the console's vents are not blocked and the room is not unusually hot. "
-        "Watch a few more sessions; plan a cleaning if the deviation grows.",
-        "Cihazın havalandırma deliklerinin kapalı olmadığından ve ortamın aşırı sıcak olmadığından emin olun. "
-        "Birkaç oturum daha izleyin; sapma büyürse temizlik planlayın.");
-    case VERDICT_CLEAN:
-      return LNGX(lang,
-        "Dust has probably built up on the fan and heatsink fins. Clean them with compressed air while the "
-        "console is off. After cleaning, reset the comparison with the 'New baseline' button.",
-        "Fan ve soğutucu kanatçıklarında toz birikmiş olabilir. Cihaz kapalıyken basınçlı hava ile "
-        "temizlik önerilir. Temizlikten sonra 'Yeni referans' düğmesiyle karşılaştırmayı sıfırlayın.");
-    case VERDICT_SERVICE:
-      return LNGX(lang,
-        "The temperature does not come down even with the fan at full speed. Start with a thorough dust "
-        "cleaning; if the problem persists, have the liquid metal / thermal interface checked by an "
-        "authorised service or an experienced technician. Re-applying liquid metal is risky; do not try it yourself.",
-        "Fan tam güçte çalışmasına rağmen sıcaklık düşmüyor. Önce kapsamlı toz temizliği yapın; "
-        "sorun sürerse sıvı metal / termal arayüz kontrolü için yetkili servis veya deneyimli bir "
-        "teknisyene başvurun. Sıvı metal yenilemesi riskli bir işlemdir, kendiniz denemeyin.");
-    default:
-      return LNGX(lang,
-        "Start a game and play for at least 15 minutes; the first evaluation is made when the game closes.",
-        "Bir oyun açın ve en az 15 dakika oynayın; ilk değerlendirme oyun kapanınca yapılır.");
+    case VERDICT_OK:      return TX_ADVICE_OK(lang);
+    case VERDICT_WATCH:   return TX_ADVICE_WATCH(lang);
+    case VERDICT_CLEAN:   return TX_ADVICE_CLEAN(lang);
+    case VERDICT_SERVICE: return TX_ADVICE_SERVICE(lang);
+    default:              return TX_ADVICE_NA(lang);
   }
 }

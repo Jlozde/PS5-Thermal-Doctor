@@ -5,9 +5,11 @@
 
 static volatile int g_lang = LANG_EN;
 
+static const char *const g_codes[LANG_COUNT] = { "en", "tr", "de", "fr", "es", "ru", "ko", "zh" };
+
 void
 i18n_set(int lang) {
-  g_lang = (lang == LANG_TR) ? LANG_TR : LANG_EN;
+  g_lang = (lang >= 0 && lang < LANG_COUNT) ? lang : LANG_EN;
 }
 
 int
@@ -30,17 +32,37 @@ int
 i18n_parse(const char *s) {
   if(!s) return -2;
   if(ieq(s, "auto")) return LANG_AUTO;
-  if(ieq(s, "en") || ieq(s, "english")) return LANG_EN;
-  if(ieq(s, "tr") || ieq(s, "turkish") || ieq(s, "türkçe") || ieq(s, "turkce")) return LANG_TR;
+  for(int l = 0; l < LANG_COUNT; l++)
+    if(ieq(s, g_codes[l])) return l;
+  static const struct { const char *name; int lang; } names[] = {
+    { "english", LANG_EN }, { "turkish", LANG_TR }, { "türkçe", LANG_TR }, { "turkce", LANG_TR },
+    { "german", LANG_DE }, { "deutsch", LANG_DE }, { "french", LANG_FR }, { "francais", LANG_FR },
+    { "français", LANG_FR }, { "spanish", LANG_ES }, { "espanol", LANG_ES }, { "español", LANG_ES },
+    { "russian", LANG_RU }, { "korean", LANG_KO }, { "chinese", LANG_ZH }, { "zh-cn", LANG_ZH },
+    { "zh-hans", LANG_ZH },
+  };
+  for(unsigned i = 0; i < sizeof(names) / sizeof(names[0]); i++)
+    if(ieq(s, names[i].name)) return names[i].lang;
   return -2;
 }
 
 const char *
 i18n_code(int lang) {
-  switch(lang) {
-    case LANG_EN: return "en";
-    case LANG_TR: return "tr";
-    default:      return "auto";
+  return (lang >= 0 && lang < LANG_COUNT) ? g_codes[lang] : "auto";
+}
+
+/* sceSystemServiceParamGetInt(SCE_SYSTEM_SERVICE_PARAM_ID_LANG) values */
+int
+i18n_from_sce(int sce_lang) {
+  switch(sce_lang) {
+    case 19: return LANG_TR;               /* Turkish */
+    case 4:  return LANG_DE;               /* German */
+    case 2:  case 22: return LANG_FR;      /* French, French (Canada) */
+    case 3:  case 20: return LANG_ES;      /* Spanish, Spanish (Latin America) */
+    case 8:  return LANG_RU;               /* Russian */
+    case 9:  return LANG_KO;               /* Korean */
+    case 10: case 11: return LANG_ZH;      /* Chinese (Traditional, Simplified) */
+    default: return LANG_EN;
   }
 }
 

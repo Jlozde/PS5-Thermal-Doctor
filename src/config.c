@@ -25,8 +25,8 @@ typedef struct {
 #define CI(k, t, f, en, tr) { k, t, offsetof(config_t, f), en, tr }
 
 static const citem_t g_items[] = {
-  CI("lang",              CT_LANG,  lang,              "Language: auto (PS5 system language), en, tr",
-                                                       "Dil: auto (PS5 sistem dili), en, tr"),
+  CI("lang",              CT_LANG,  lang,              "Language: auto (PS5 system language), en, tr, de, fr, es, ru, ko, zh",
+                                                       "Dil: auto (PS5 sistem dili), en, tr, de, fr, es, ru, ko, zh"),
   CI("temp_unit",         CT_UNIT,  temp_unit,         "Temperature unit: c (Celsius) or f (Fahrenheit); thresholds below stay in °C",
                                                        "Sıcaklık birimi: c (Celsius) veya f (Fahrenheit); aşağıdaki eşikler °C kalır"),
   CI("http_port",         CT_UINT,  http_port,         "Web UI port", "Web arayüzü portu"),
@@ -109,7 +109,7 @@ clamp_f(float *v, float lo, float hi) { if(*v < lo) *v = lo; if(*v > hi) *v = hi
 
 void
 config_sanitize(config_t *c) {
-  if(c->lang != LANG_EN && c->lang != LANG_TR) c->lang = LANG_AUTO;
+  if(c->lang < 0 || c->lang >= LANG_COUNT) c->lang = LANG_AUTO;
   if(c->temp_unit != TEMP_F) c->temp_unit = TEMP_C;
   clamp_u(&c->http_port, 1024, 65535);
   clamp_u(&c->sample_ms, 250, 10000);

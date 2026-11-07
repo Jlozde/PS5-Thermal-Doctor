@@ -31,7 +31,7 @@ Yalnızca sıcaklığa bakarak bu yakalanamaz. PS5 Thermal Doctor **fan devrini,
 
 - **Yalnızca okur.** Overlay yok, fan kontrolü yok, ayar değiştirme yok. Sensörleri okur ve konsolda hiçbir şeyi değiştirmez.
 - **Sonuç baktığınız yerde.** Oyun kapanınca PS5 bildirimi, telefonda veya PC'de web arayüzü.
-- **İngilizce ve Türkçe.** Kullanıcının gördüğü her metin iki dilde de var.
+- **Uygulamada sekiz dil.** Web arayüzü, kararlar ve PS5 bildirimleri İngilizce, Türkçe, Almanca, Fransızca, İspanyolca, Rusça, Korece ve Basitleştirilmiş Çince olarak kullanılabilir. Günlük ve `config.ini` açıklamaları İngilizce ve Türkçe kalır.
 - **°C veya °F.** Varsayılan Celsius; Ayarlar sekmesinden Fahrenheit seçilebilir.
 
 ## Nasıl çalışır
@@ -89,12 +89,13 @@ Payload her konsol yeniden başlatmasında tekrar gönderilmelidir. etaHEN bunu 
 
 | Nerede | Dil nasıl seçilir |
 |---|---|
-| Web arayüzü | Başlıktaki **EN / TR** düğmeleri ya da adreste `?lang=en` / `?lang=tr`. İlk ziyarette tarayıcı dili kullanılır; seçim tarayıcıda hatırlanır. |
-| PS5 bildirimleri, günlük dosyası, payload çıktısı | Ayarlar sekmesindeki **Konsol dili** (`config.ini` içindeki `lang` anahtarı): `auto` (PS5 sistem dili; Türkçe ise Türkçe, diğerleri İngilizce), `en` veya `tr`. |
-| JSON API | `/api/status` ve `/api/log` için `?lang=en` veya `?lang=tr`. Verilmezse konsol dili kullanılır. |
-| `config.ini` | Her anahtarın her iki dilde açıklama satırı vardır. Ayarlar sekmesi aynı anahtarları düzenler. |
+| Web arayüzü | Başlıktaki dil menüsü ya da adreste `?lang=` (`en`, `tr`, `de`, `fr`, `es`, `ru`, `ko`, `zh`). İlk ziyarette tarayıcı dili kullanılır; seçim tarayıcıda hatırlanır. |
+| PS5 bildirimleri | Ayarlar sekmesindeki **Konsol dili** (`config.ini` içindeki `lang` anahtarı): `auto` PS5 sistem dilini izler (uygulamada olmayan bir dil → İngilizce) ya da yukarıdaki kodlardan biri. |
+| Günlük dosyası, payload çıktısı | İngilizce veya Türkçe: konsol dili Türkçe ise Türkçe, değilse İngilizce. |
+| JSON API | `/api/status` ve `/api/log` için yukarıdaki kodlardan biriyle `?lang=`. Verilmezse konsol dili kullanılır. |
+| `config.ini` | Her anahtarın İngilizce ve Türkçe açıklama satırı vardır. Ayarlar sekmesi aynı anahtarları düzenler. |
 
-Bellekteki günlük her satırı iki dilde tutar. Bu yüzden web arayüzünün dilini değiştirmek günlük görünümünü de değiştirir.
+Bellekteki günlük her satırı İngilizce ve Türkçe tutar. Bu yüzden web arayüzünü bu iki dil arasında değiştirmek günlük görünümünü de değiştirir. Diğer dillerde günlük İngilizce gösterilir.
 
 ## Konsoldaki dosyalar
 
@@ -110,8 +111,9 @@ Bellekteki günlük her satırı iki dilde tutar. Bu yüzden web arayüzünün d
 
 ```
 src/analysis.c       teşhis mantığı (taşınabilir, PC'de test edilir)
-src/i18n.c           dil seçimi (en / tr)
-src/log.c            iki dilli günlük (halka tampon + dosya)
+src/i18n.c           dil seçimi (8 dil)
+src/texts.h          oyuncuya görünen metinler, tools/gen_i18n.py üretir
+src/log.c            İngilizce / Türkçe günlük (halka tampon + dosya)
 src/platform.c       PS5 donanım erişimi (sensörler, dce, bildirim, sistem dili)
 src/sampler.c        1 Hz örnekleme, oturum yönetimi, CSV
 src/http.c           web sunucusu + JSON API
@@ -119,6 +121,8 @@ web/index.html       web arayüzü (ELF'e gömülür)
 tools/build.ps1      WSL'siz Windows derlemesi
 tools/send_payload.ps1   ELF'i elfldr'a gönderir
 tools/devserver.py   arayüzü PC'de denemek için sahte sunucu
+tools/i18n_texts.py  uygulama metinlerinin çevirileri (tek kaynak)
+tools/gen_i18n.py    src/texts.h dosyasını ve web/index.html içindeki metin tablosunu yazar
 test/                PC testleri ve sözdizimi denetimi (test\host-check.ps1)
 docs/                kurulum rehberi, teşhis mantığı, README görselleri
 ```
@@ -130,6 +134,7 @@ powershell -ExecutionPolicy Bypass -File .\test\host-check.ps1   # teşhis testl
 python tools\devserver.py                                        # http://localhost:8088, sağlıklı konsol
 $env:PS5TD_SIM="dusty"; python tools\devserver.py                 # tozlu konsol senaryosu
 $env:PS5TD_LANG="tr"; python tools\devserver.py                   # Türkçe konsol simülasyonu
+python tools\gen_i18n.py                                         # tools\i18n_texts.py düzenlendikten sonra
 ```
 
 Linux'ta: `make test`. `v*` etiketi gönderildiğinde GitHub Actions bir release yayınlar; bkz. [docs/INSTALL.tr.md](docs/INSTALL.tr.md#b-github-actions).

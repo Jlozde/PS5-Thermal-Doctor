@@ -14,13 +14,14 @@
  *  POST /api/notify/test       try a PS5 notification
  *  GET  /api/log?lang=en       latest log lines
  *
- * "lang" (en / tr) picks the language of human-readable text; without it the
+ * "lang" (en, tr, de, fr, es, ru, ko, zh) picks the language of human-readable text; without it the
  * console language is used.
  */
 #include "http.h"
 #include "analysis.h"
 #include "config.h"
 #include "i18n.h"
+#include "texts.h"
 #include "log.h"
 #include "platform.h"
 #include "ps5td.h"
@@ -309,7 +310,7 @@ query_lang(const char *query) {
   char v[16];
   if(query_get(query, "lang", v, sizeof(v))) {
     int l = i18n_parse(v);
-    if(l == LANG_EN || l == LANG_TR) return l;
+    if(l >= 0 && l < LANG_COUNT) return l;
   }
   return i18n_get();
 }
@@ -491,7 +492,7 @@ handle(int fd) {
     sampler_reset_baseline();
     respond_text(fd, 200, "{\"ok\":true}");
   } else if(strcmp(r.path, "/api/notify/test") == 0 && post) {
-    plat_notify(LNG("%s\nNotification test: the web UI works.", "%s\nBildirim testi: web arayüzü çalışıyor."), PS5TD_NAME);
+    plat_notify(TX_NOTIFY_TEST(i18n_get()), PS5TD_NAME);
     respond_text(fd, 200, "{\"ok\":true}");
   } else if(strcmp(r.path, "/api/log") == 0 && get) {
     h_log(fd, r.query);

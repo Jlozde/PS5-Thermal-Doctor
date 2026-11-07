@@ -28,7 +28,7 @@ powershell -ExecutionPolicy Bypass -File .\tools\build.ps1        # -> ps5-therm
 - `-ShowCommands` çalıştırılan komutları gösterir. `-NoStrip` sembolleri bırakır; ayrı dosya için `-Out build\debug.elf` ile birlikte kullanın.
 - Betik Makefile ile aynı bayrakları ve SDK'nın `bin/prospero-clang` sarmalayıcısının mantığını kullanır. clang 20+ ile crt nesnelerini sürücü kendisi ekler (`SCE_PROSPERO_SDK_DIR`).
 - Proje ağ paylaşımındaysa (`\\sunucu\...`) PowerShell imzasız betikleri "not digitally signed" diye engeller. Bu yüzden `powershell -ExecutionPolicy Bypass -File ...` biçimi kullanılır. Kalıcı çözüm `Set-ExecutionPolicy -Scope CurrentUser Bypass`'tır; bu güvenlik tercihi size aittir.
-- Denenen bileşim: SDK v0.45 (2026-10-21) + llvm-mingw 20261104 (clang 23.1.5), sonuç ~165 KB ELF.
+- Denenen bileşim: SDK v0.45 (2026-10-21) + llvm-mingw 20261104 (clang 23.1.5), sonuç ~260 KB ELF.
 
 ## B) GitHub Actions
 
@@ -76,8 +76,9 @@ Payload ikinci kez gönderilirse eski örnek kendiliğinden durdurulur: pid'i po
 
 ## Dil
 
-- Web arayüzü: başlıktaki **EN / TR** düğmeleri.
-- Bildirimler, günlük ve payload çıktısı: `/data/ps5td/config.ini` içindeki `lang = auto | en | tr`. Web arayüzünün Ayarlar sekmesinden de değiştirilebilir. `auto`, PS5 sistem dilini izler.
+- Web arayüzü: başlıktaki dil menüsü. İngilizce, Türkçe, Almanca, Fransızca, İspanyolca, Rusça, Korece ve Basitleştirilmiş Çince seçilebilir.
+- PS5 bildirimleri: `/data/ps5td/config.ini` içindeki `lang = auto | en | tr | de | fr | es | ru | ko | zh`. Web arayüzünün Ayarlar sekmesinden de değiştirilebilir. `auto`, PS5 sistem dilini izler; uygulamada olmayan bir dil İngilizceye düşer.
+- Günlük ve payload çıktısı konsol dili Türkçe ise Türkçe, değilse İngilizcedir.
 - Açılış günlüğü seçilen dili yazar, örneğin `Dil: tr (ayar auto, PS5 sistem dili kodu 19).`
 
 ## Sıcaklık birimi
@@ -99,6 +100,6 @@ ELF'i `/data/etaHEN/payloads/` altına kopyalayın (FTP, port 1337). etaHEN Tool
 | Güç `–` | `sceKernelGetSocPowerConsumption` yok ya da beklenmeyen yerleşimde (günlüğe bakın). |
 | Oyun açıkken "yok" görünüyor | `sceSystemServiceGetAppIdOfRunningBigApp` yanıt vermiyor. pfsmnt yedeği de boşsa günlüğü paylaşın. |
 | Web arayüzü açılmıyor | PS5 ile aynı ağda mısınız? Port `config.ini`'de değiştirilmiş olabilir. |
-| Metinler yanlış dilde | Web arayüzü: EN / TR düğmeleri. Bildirimler: `lang = en` veya `lang = tr`. |
+| Metinler yanlış dilde | Web arayüzü: başlıktaki dil menüsü. Bildirimler: Ayarlar sekmesindeki **Konsol dili** (örneğin `lang = tr`). |
 
 Günlük: `http://<ip>:8088/api/log?lang=tr` veya `/data/ps5td/ps5td.log`.

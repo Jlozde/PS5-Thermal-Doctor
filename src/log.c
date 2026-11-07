@@ -18,7 +18,7 @@
 #define LOG_LINE  240
 #define LOG_MAX_FILE (512 * 1024)
 
-static char            g_lines[LOG_LINES][LANG_COUNT][LOG_LINE];
+static char            g_lines[LOG_LINES][LANG_TECH_COUNT][LOG_LINE];
 static unsigned        g_head, g_count;
 static char            g_path[256];
 static pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -33,7 +33,7 @@ log_init(const char *path) {
 
 void
 log_printf2(const char *fmt_en, const char *fmt_tr, ...) {
-  char msg[LANG_COUNT][LOG_LINE];
+  char msg[LANG_TECH_COUNT][LOG_LINE];
   char stamp[32];
   va_list ap, ap2;
 
@@ -44,10 +44,10 @@ log_printf2(const char *fmt_en, const char *fmt_tr, ...) {
   va_end(ap2);
   va_end(ap);
   util_fmt_utc(util_wall_ms(), stamp, sizeof(stamp), 0);
-  const char *cur = msg[i18n_get() == LANG_TR ? LANG_TR : LANG_EN];
+  const char *cur = msg[LANG_TECH(i18n_get())];
 
   pthread_mutex_lock(&g_lock);
-  for(int l = 0; l < LANG_COUNT; l++)
+  for(int l = 0; l < LANG_TECH_COUNT; l++)
     snprintf(g_lines[g_head][l], LOG_LINE, "%s %s", stamp, msg[l]);
   g_head = (g_head + 1) % LOG_LINES;
   if(g_count < LOG_LINES) g_count++;
@@ -72,7 +72,7 @@ size_t
 log_tail(int lang, char *out, size_t n) {
   size_t used = 0;
   if(!out || n == 0) return 0;
-  int l = lang == LANG_TR ? LANG_TR : LANG_EN;
+  int l = LANG_TECH(lang);
   out[0] = '\0';
   pthread_mutex_lock(&g_lock);
   unsigned first = (g_head + LOG_LINES - g_count) % LOG_LINES;

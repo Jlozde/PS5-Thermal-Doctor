@@ -29,7 +29,7 @@ typedef struct {
   uint64_t first_ms, last_ms;
 } baseline_t;
 
-#define AN_REASON_LEN 220
+#define AN_REASON_LEN 512   /* room for several reasons in Cyrillic / CJK UTF-8 */
 
 typedef struct {
   int      verdict;             /* final verdict */

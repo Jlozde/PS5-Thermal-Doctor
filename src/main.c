@@ -11,6 +11,7 @@
 #include "config.h"
 #include "http.h"
 #include "i18n.h"
+#include "texts.h"
 #include "log.h"
 #include "platform.h"
 #include "probe.h"
@@ -142,7 +143,7 @@ main(int argc, char **argv) {
       announced = 1;
       LOG("Web UI: http://%s:%u", "Web arayüzü: http://%s:%u", ip, cfg.http_port);
       if(cfg.notify_startup)
-        plat_notify(LNG("%s %s started\nhttp://%s:%u", "%s %s başladı\nhttp://%s:%u"),
+        plat_notify(TX_NOTIFY_START(i18n_get()),
                     PS5TD_NAME, PS5TD_VERSION, ip, cfg.http_port);
     }
     http_run(srv);   /* does not return */

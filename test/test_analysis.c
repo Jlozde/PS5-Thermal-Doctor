@@ -153,19 +153,31 @@ test_trend(const config_t *c) {
 
 static void
 test_i18n(const config_t *c) {
-  printf("[4] Two languages\n");
+  printf("[4] Languages\n");
   CHECK(i18n_parse("en") == LANG_EN && i18n_parse("TR") == LANG_TR && i18n_parse("auto") == LANG_AUTO, "language codes parse");
-  CHECK(i18n_parse("de") == -2 && i18n_parse(NULL) == -2, "unknown language codes are rejected");
+  CHECK(i18n_parse("xx") == -2 && i18n_parse(NULL) == -2, "unknown language codes are rejected");
   CHECK(strcmp(i18n_code(LANG_TR), "tr") == 0 && strcmp(i18n_code(LANG_AUTO), "auto") == 0, "language codes print");
+  int round_trip = 1;
+  for(int l = 0; l < LANG_COUNT; l++) round_trip &= i18n_parse(i18n_code(l)) == l;
+  CHECK(round_trip && i18n_parse("Deutsch") == LANG_DE && i18n_parse("zh-CN") == LANG_ZH, "all %d language codes round-trip", LANG_COUNT);
+  CHECK(i18n_from_sce(19) == LANG_TR && i18n_from_sce(4) == LANG_DE && i18n_from_sce(2) == LANG_FR &&
+        i18n_from_sce(22) == LANG_FR && i18n_from_sce(3) == LANG_ES && i18n_from_sce(20) == LANG_ES &&
+        i18n_from_sce(8) == LANG_RU && i18n_from_sce(9) == LANG_KO && i18n_from_sce(11) == LANG_ZH &&
+        i18n_from_sce(1) == LANG_EN && i18n_from_sce(0) == LANG_EN && i18n_from_sce(-1) == LANG_EN,
+        "PS5 system language codes map to app languages");
 
   for(int v = VERDICT_NA; v <= VERDICT_SERVICE; v++) {
-    const char *le = an_verdict_label(v, LANG_EN), *lt = an_verdict_label(v, LANG_TR);
-    const char *ae = an_verdict_advice(v, LANG_EN), *at = an_verdict_advice(v, LANG_TR);
-    CHECK(le[0] && lt[0] && strcmp(le, lt) != 0, "verdict %d has distinct EN/TR labels", v);
-    CHECK(ae[0] && at[0] && strcmp(ae, at) != 0, "verdict %d has distinct EN/TR advice", v);
+    int distinct = 1;
+    for(int l = 0; l < LANG_COUNT; l++) {
+      const char *lb = an_verdict_label(v, l), *ad = an_verdict_advice(v, l), *bd = an_verdict_badge(v, l);
+      distinct &= lb[0] && ad[0] && bd[0];
+      if(l != LANG_EN) distinct &= strcmp(lb, an_verdict_label(v, LANG_EN)) != 0 && strcmp(ad, an_verdict_advice(v, LANG_EN)) != 0;
+    }
+    CHECK(distinct, "verdict %d has its own label and advice in all %d languages", v, LANG_COUNT);
   }
   CHECK(strcmp(an_verdict_badge(VERDICT_CLEAN, LANG_EN), "CLEAN") == 0 &&
-        strcmp(an_verdict_badge(VERDICT_CLEAN, LANG_TR), "TEMİZLİK") == 0, "badges in both languages");
+        strcmp(an_verdict_badge(VERDICT_CLEAN, LANG_TR), "TEMİZLİK") == 0 &&
+        strcmp(an_verdict_badge(VERDICT_CLEAN, LANG_DE), "REINIGEN") == 0, "badges per language");
 
   /* Percent placement: English "38%", Turkish "%38" */
   session_summary_t h = run_session(c, 1700000000000ULL, 1800, 72, 38, 170, 60, 0, "PPSA00001");
@@ -174,6 +186,23 @@ test_i18n(const config_t *c) {
   an_verdict_abs(&h, c, LANG_TR, tr, sizeof(tr));
   CHECK(strstr(en, "%,") != NULL && strstr(en, "normal range") != NULL, "EN reason: number then %% (%s)", en);
   CHECK(strstr(tr, "fan %") != NULL && strstr(tr, "normal aralıkta") != NULL, "TR reason: %% then number (%s)", tr);
+  char de[AN_REASON_LEN], zh[AN_REASON_LEN];
+  an_verdict_abs(&h, c, LANG_DE, de, sizeof(de));
+  an_verdict_abs(&h, c, LANG_ZH, zh, sizeof(zh));
+  CHECK(strstr(de, " %,") != NULL && strstr(de, "Normalbereich") != NULL, "DE reason: number, space, %% (%s)", de);
+  CHECK(strstr(zh, "正常范围") != NULL, "ZH reason (%s)", zh);
+
+  /* The longest reasons (two at once) fit in every language */
+  session_summary_t worst = run_session(c, 1700000000000ULL, 1800, 98, 92, 200, 60, 0, "PPSA00003");
+  int fits = 1, two = 1;
+  for(int l = 0; l < LANG_COUNT; l++) {
+    char w[AN_REASON_LEN];
+    int vw = an_verdict_abs(&worst, c, l, w, sizeof(w));
+    fits &= vw == VERDICT_SERVICE && strlen(w) + 1 < sizeof(w);
+    two &= strstr(w, "%") != NULL;   /* the fan reason with its percent is there after the danger reason */
+    if(l == LANG_RU || l == LANG_KO) printf("    %s\n", w);
+  }
+  CHECK(fits && two, "two reasons fit in AN_REASON_LEN in all languages");
 
   /* Temperature unit: values stay in °C, texts follow temp_unit */
   CHECK(i18n_parse_unit("c") == TEMP_C && i18n_parse_unit("F") == TEMP_F && i18n_parse_unit("Fahrenheit") == TEMP_F &&
@@ -211,6 +240,13 @@ test_i18n(const config_t *c) {
   CHECK(strstr(buf, "test line 7") != NULL, "log tail in English");
   log_tail(LANG_TR, buf, sizeof(buf));
   CHECK(strstr(buf, "deneme satırı 7") != NULL, "log tail in Turkish");
+  log_tail(LANG_KO, buf, sizeof(buf));
+  CHECK(strstr(buf, "test line 7") != NULL, "the log falls back to English for other languages");
+  i18n_set(LANG_RU);
+  CHECK(i18n_get() == LANG_RU && strcmp(LNG("yes", "evet"), "yes") == 0, "technical texts fall back to English (ru)");
+  i18n_set(LANG_COUNT + 3);
+  CHECK(i18n_get() == LANG_EN, "an invalid language becomes English");
+  i18n_set(LANG_EN);
 }
 
 static void
@@ -248,6 +284,10 @@ test_persistence(const config_t *c) {
         "bad lines are counted, values clamped (bad=%d port=%u)", bad, b.http_port);
   bad = config_apply_text(&b, "temp_unit = C\n");
   CHECK(bad == 0 && b.temp_unit == TEMP_C, "temp_unit = C");
+  bad = config_apply_text(&b, "lang = ko\n");
+  CHECK(bad == 0 && b.lang == LANG_KO, "lang = ko");
+  config_to_text(&b, txt, sizeof(txt));
+  CHECK(strstr(txt, "lang = ko") != NULL, "lang = ko is written back");
   bad = config_apply_text(&b, "lang = auto\n");
   CHECK(bad == 0 && b.lang == LANG_AUTO, "lang = auto");
 

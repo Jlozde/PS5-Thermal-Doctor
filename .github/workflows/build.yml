@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
+      - name: Translations are complete and generated files are up to date
+        run: python3 tools/gen_i18n.py --check
       - name: Diagnosis tests (gcc)
         run: make test HOST_CC=gcc
 

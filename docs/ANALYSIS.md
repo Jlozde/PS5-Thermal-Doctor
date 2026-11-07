@@ -83,7 +83,9 @@ A hot PS5 does not lower its FPS: it spins the fan up and, if that is not enough
 
 ## Language of the texts
 
-Every reason, label and piece of advice is produced in both English and Turkish at the same time (`an_overall` fills both). The API returns the language asked for with `?lang=`. Notifications and the log use the `lang` setting.
+Every reason, label and piece of advice is produced in all eight app languages at the same time (`an_overall` fills them all): English, Turkish, German, French, Spanish, Russian, Korean and Simplified Chinese. The API returns the language asked for with `?lang=`. Notifications use the `lang` setting; the log stays in English or Turkish.
+
+The translations live in one table, `tools/i18n_texts.py`. `tools/gen_i18n.py` turns it into `src/texts.h` for the payload and into the text table of `web/index.html`; the devserver reads the same table. The generator stops if a translation is missing or if a translated format string does not take the same values in the same order as the English one. Each language keeps its own number style, for example `38 %` in German and French and `%38` in Turkish.
 
 Temperatures in the texts follow the `temp_unit` setting: °C by default, °F if chosen. Only the text changes. Measurements, the CDI and every threshold are stored and compared in °C. Absolute values are converted with ×1.8 + 32, differences (drift, trend, warm-up rate) with ×1.8. The log always stays in °C.
 

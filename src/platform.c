@@ -42,7 +42,6 @@ int sceSystemServiceGetAppIdOfRunningBigApp(void)                   __attribute_
 int sceSystemServiceParamGetInt(int param_id, int *value)           __attribute__((weak));
 
 #define SCE_PARAM_ID_LANG   1    /* SCE_SYSTEM_SERVICE_PARAM_ID_LANG */
-#define SCE_LANG_TURKISH    19   /* SCE_SYSTEM_PARAM_LANG_TURKISH */
 
 typedef struct {
   char useless1[45];
@@ -53,8 +52,8 @@ int sceKernelSendNotificationRequest(int, notify_request_t *, size_t, int);
 /* Auth id that may open /dev/icc_fan; measured by ps5-cooling-system-center-pro. */
 #define AUTHID_FAN 0x4801000000000013ULL
 
-static char g_symbols[LANG_COUNT][256];
-static char g_dce_text[LANG_COUNT][128] = { "not tried yet", "henüz denenmedi" };
+static char g_symbols[LANG_TECH_COUNT][256];
+static char g_dce_text[LANG_TECH_COUNT][128] = { "not tried yet", "henüz denenmedi" };
 
 static void set_dce_text(const char *en, const char *tr, ...)
   __attribute__((format(printf, 1, 3), format(printf, 2, 3)));
@@ -104,13 +103,13 @@ static int g_sys_lang_raw = -2;   /* -2 = not asked yet, -1 = unavailable */
 void
 plat_apply_lang(int cfg_lang) {
   int lang = cfg_lang;
-  if(lang != LANG_EN && lang != LANG_TR) {
+  if(lang < 0 || lang >= LANG_COUNT) {
     if(g_sys_lang_raw == -2) {
       int v = -1;
       if(!sceSystemServiceParamGetInt || sceSystemServiceParamGetInt(SCE_PARAM_ID_LANG, &v) != 0) v = -1;
       g_sys_lang_raw = v;
     }
-    lang = g_sys_lang_raw == SCE_LANG_TURKISH ? LANG_TR : LANG_EN;
+    lang = i18n_from_sce(g_sys_lang_raw);
   }
   i18n_set(lang);
 }
@@ -119,8 +118,8 @@ plat_apply_lang(int cfg_lang) {
 
 int
 plat_init(const config_t *c) {
-  const char *yes[LANG_COUNT] = { "ok", "var" }, *no[LANG_COUNT] = { "MISSING", "YOK" };
-  for(int l = 0; l < LANG_COUNT; l++)
+  const char *yes[LANG_TECH_COUNT] = { "ok", "var" }, *no[LANG_TECH_COUNT] = { "MISSING", "YOK" };
+  for(int l = 0; l < LANG_TECH_COUNT; l++)
     snprintf(g_symbols[l], sizeof(g_symbols[l]),
              "CpuTemp:%s SocSensor:%s FanDuty:%s SocPower:%s BigApp:%s SysLang:%s",
              sceKernelGetCpuTemperature ? yes[l] : no[l],
@@ -447,5 +446,5 @@ plat_local_ip(char *out, size_t n) {
   return rc;
 }
 
-const char *plat_symbols_text(int lang) { return g_symbols[lang == LANG_TR ? LANG_TR : LANG_EN]; }
-const char *plat_dce_text(int lang)     { return g_dce_text[lang == LANG_TR ? LANG_TR : LANG_EN]; }
+const char *plat_symbols_text(int lang) { return g_symbols[LANG_TECH(lang)]; }
+const char *plat_dce_text(int lang)     { return g_dce_text[LANG_TECH(lang)]; }

@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #define PS5TD_NAME          "PS5 Thermal Doctor"
-#define PS5TD_VERSION       "0.2.1"
+#define PS5TD_VERSION       "0.2.2"
 #define PS5TD_PROCESS_NAME  "ps5td.elf"
 
 #define PS5TD_DATA_DIR      "/data/ps5td"

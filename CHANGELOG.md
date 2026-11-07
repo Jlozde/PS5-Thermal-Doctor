@@ -4,6 +4,19 @@
 
 Downloads are on the [Releases](https://github.com/Jlozde/PS5-Thermal-Doctor/releases) page.
 
+## 0.2.2 (2026-11-07)
+
+### Added
+- **Six more app languages:** German, French, Spanish, Russian, Korean and Simplified Chinese, next to English and Turkish. They cover the web UI, the verdicts, reasons and advice, and the PS5 notifications.
+- `lang = de | fr | es | ru | ko | zh` in `config.ini` and in the Settings tab. `lang = auto` now maps these PS5 system languages too; any other system language uses English.
+- `?lang=` on the web UI and the API accepts the new codes.
+- `tools/i18n_texts.py` holds every app text in one table; `tools/gen_i18n.py` generates `src/texts.h` and the web UI text table from it and checks that every translation takes the same values as the English text. CI runs the check.
+
+### Changed
+- The **EN / TR** buttons in the web UI header became a language menu.
+- Percentages and durations follow the chosen language's style (`38 %` in German and French, `%38` in Turkish).
+- The log and the `config.ini` comments stay in English and Turkish. With another language the log is shown in English, and the Settings tab says so.
+
 ## 0.2.1 (2026-11-07)
 
 ### Added

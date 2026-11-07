@@ -10,6 +10,7 @@
 #include "config.h"
 #include "history.h"
 #include "i18n.h"
+#include "texts.h"
 #include "log.h"
 #include "platform.h"
 #include "probe.h"
@@ -159,13 +160,11 @@ session_end(const char *end_en, const char *end_tr) {
       int final_v = ov.verdict != VERDICT_NA ? ov.verdict : sum.verdict;
       char pw[24] = "";
       if(sum.power_valid) snprintf(pw, sizeof(pw), " · %.0f W", (double)sum.ss_power);
-      plat_notify(LNG("%s\n%s · %u min · SoC %.0f%s · Fan %.0f%%%s\n%s",
-                      "%s\n%s · %u dk · SoC %.0f%s · Fan %%%.0f%s\n%s"),
+      plat_notify(TX_NOTIFY_SUMMARY(i18n_get()),
                   PS5TD_NAME, sum.title, sum.dur_s / 60, i18n_temp(sum.ss_soc, g_cfg.temp_unit),
                   i18n_unit_sym(g_cfg.temp_unit), (double)sum.ss_fan, pw, an_verdict_label(final_v, i18n_get()));
     } else {
-      plat_notify(LNG("%s\n%s · %u min · peak SoC %.0f%s\nPlay longer for a steady measurement.",
-                      "%s\n%s · %u dk · en yüksek SoC %.0f%s\nKararlı ölçüm için daha uzun oynayın."),
+      plat_notify(TX_NOTIFY_SHORT(i18n_get()),
                   PS5TD_NAME, sum.title, sum.dur_s / 60, i18n_temp(sum.max_soc, g_cfg.temp_unit),
                   i18n_unit_sym(g_cfg.temp_unit));
     }
@@ -191,8 +190,7 @@ session_live_update(const sample_t *s) {
 
   if(v == VERDICT_SERVICE && g_cfg.notify_live_warn && !g_live_warned) {
     g_live_warned = 1;
-    plat_notify(LNG("%s - Warning\nSoC %.0f%s, fan %.0f%%: cooling looks insufficient.",
-                    "%s - Uyarı\nSoC %.0f%s, fan %%%.0f: soğutma yetersiz görünüyor."),
+    plat_notify(TX_NOTIFY_WARN(i18n_get()),
                 PS5TD_NAME, i18n_temp(sum.ss_soc, g_cfg.temp_unit), i18n_unit_sym(g_cfg.temp_unit),
                 (double)sum.ss_fan);
   }
@@ -275,6 +273,7 @@ sampler_start(void) {
   pthread_attr_t attr;
   pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+  pthread_attr_setstacksize(&attr, 256 * 1024);   /* texts for every language live on the stack */
   int rc = pthread_create(&th, &attr, sampler_thread, NULL);
   pthread_attr_destroy(&attr);
   if(rc != 0) LOG("Cannot start the sampler thread (%d).", "Örnekleyici iş parçacığı başlatılamadı (%d).", rc);

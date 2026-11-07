@@ -83,7 +83,9 @@ PS5 ısınınca FPS düşürmez: fanı açar, yetmezse kapanır. FPS burada yaln
 
 ## Metinlerin dili
 
-Tüm gerekçe, etiket ve öneriler aynı anda hem İngilizce hem Türkçe üretilir (`an_overall` ikisini de doldurur). API, `?lang=` ile istenen dili döndürür. Bildirimler ve günlük `lang` ayarını kullanır.
+Tüm gerekçe, etiket ve öneriler uygulamanın sekiz dilinde aynı anda üretilir (`an_overall` hepsini doldurur): İngilizce, Türkçe, Almanca, Fransızca, İspanyolca, Rusça, Korece ve Basitleştirilmiş Çince. API, `?lang=` ile istenen dili döndürür. Bildirimler `lang` ayarını kullanır; günlük İngilizce veya Türkçe kalır.
+
+Çeviriler tek bir tabloda durur: `tools/i18n_texts.py`. `tools/gen_i18n.py` bu tablodan payload için `src/texts.h` dosyasını ve `web/index.html` içindeki metin tablosunu üretir; devserver da aynı tabloyu okur. Bir çeviri eksikse ya da çevrilmiş bir biçim dizgisi İngilizcesiyle aynı değerleri aynı sırada almıyorsa üretici durur. Her dil kendi sayı yazımını korur; örneğin Almanca ve Fransızcada `38 %`, Türkçede `%38`.
 
 Metinlerdeki sıcaklıklar `temp_unit` ayarını izler: varsayılan °C, seçilirse °F. Yalnızca metin değişir. Ölçümler, CDI ve tüm eşikler °C olarak saklanır ve karşılaştırılır. Mutlak değerler ×1,8 + 32, farklar (sapma, eğilim, ısınma hızı) ×1,8 ile dönüştürülür. Günlük her zaman °C kalır.
 

@@ -7,22 +7,30 @@ PC'de web arayüzünü denemek için sahte PS5 sunucusu.
     PS5TD_SIM=dusty python tools/devserver.py  # dusty console / tozlu konsol
     http://localhost:8088
 
-It serves the same API shape as the payload (including ?lang=en|tr) and uses a
+It serves the same API shape as the payload (including ?lang=) and uses a
 simplified copy of the diagnosis logic; the real logic lives in src/analysis.c.
-Payload ile aynı API şeklini (?lang=en|tr dahil) sunar; teşhis mantığının
+Texts come from tools/i18n_texts.py, the same table the payload is built from.
+Payload ile aynı API şeklini (?lang= dahil) sunar; teşhis mantığının
 basitleştirilmiş bir kopyasını kullanır, gerçeği src/analysis.c içindedir.
+Metinler, payload'ın da kullandığı tools/i18n_texts.py tablosundan gelir.
 
 Environment / ortam: PS5TD_SIM=healthy|dusty, PS5TD_PORT=8088,
-PS5TD_BACKFILL=<seconds of fake history>, PS5TD_BIND=127.0.0.1, PS5TD_LANG=en|tr (default "console" language).
+PS5TD_BACKFILL=<seconds of fake history>, PS5TD_BIND=127.0.0.1,
+PS5TD_LANG=en|tr|de|fr|es|ru|ko|zh (default "console" language).
 """
-import json, math, os, random, time
+import json, math, os, random, sys, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from i18n_texts import LANGS, SERVER  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODE = os.environ.get("PS5TD_SIM", "healthy")
 PORT = int(os.environ.get("PS5TD_PORT", "8088"))
-CONSOLE_LANG = "tr" if os.environ.get("PS5TD_LANG", "en").lower().startswith("tr") else "en"
+CODES = [c for c, _, _ in LANGS]
+CONSOLE_LANG = os.environ.get("PS5TD_LANG", "en").lower()[:2]
+CONSOLE_LANG = CONSOLE_LANG if CONSOLE_LANG in CODES else "en"
 T0 = time.time()
 random.seed(7)
 
@@ -44,12 +52,18 @@ LOG = []  # (time, en, tr)
 
 
 def L(lang, en, tr):
-    """Pick a string by language / dile göre metin seç."""
+    """Technical text (log, diagnostics): English / Turkish, others fall back to English."""
     return tr if lang == "tr" else en
 
 
+def X(key, lang, *args):
+    """Player-facing text from tools/i18n_texts.py, printf-style like the payload."""
+    fmt = SERVER[key][CODES.index(lang)]
+    return fmt % args if args else fmt
+
+
 def console_lang():
-    return CFG["lang"] if CFG["lang"] in ("en", "tr") else CONSOLE_LANG
+    return CFG["lang"] if CFG["lang"] in CODES else CONSOLE_LANG
 
 
 def log(en, tr):
@@ -78,11 +92,6 @@ def td(v): return v * 1.8 if CFG["temp_unit"] == "f" else v
 def tsym(): return "°F" if CFG["temp_unit"] == "f" else "°C"
 
 
-def pct(lang, v):
-    """Turkish writes the percent sign first: 38% / %38."""
-    return f"%{v:.0f}" if lang == "tr" else f"{v:.0f}%"
-
-
 def cdi(soc, fan, pw):
     v = soc + CFG["k_fan"] * (fan - 40)
     if pw is not None:
@@ -100,38 +109,13 @@ def verdict_abs(soc, fan):
 def abs_reason(lang, soc, fan, pw):
     """Same wording as an_verdict_abs() in src/analysis.c."""
     v = verdict_abs(soc, fan)
-    f = pct(lang, fan)
-    s = f"{tc(soc):.0f}{tsym()}"
-    if v == 3:
-        return L(lang, f"Fan at {f} and SoC still {s}: cooling is insufficient.",
-                       f"Fan {f}'de çalışırken SoC {s}: soğutma yetersiz.")
-    if v == 2:
-        return L(lang, f"Fan {f} and SoC {s}: the fan struggles to hold the temperature at high speed.",
-                       f"Fan {f} ve SoC {s}: fan yüksek devirde sıcaklığı zor tutuyor.")
-    if v == 1:
-        return L(lang, f"Fan {f} and SoC {s}: slightly above normal.",
-                       f"Fan {f} ve SoC {s}: normalin biraz üstünde.")
-    return L(lang, f"SoC {s}, fan {f}, {pw:.0f} W: values are in the normal range.",
-                   f"SoC {s}, fan {f}, {pw:.0f} W: değerler normal aralıkta.")
+    if v > 0:
+        return X(("abs_watch", "abs_clean", "abs_service")[v - 1], lang, fan, tc(soc), tsym())
+    return X("ok_power", lang, tc(soc), tsym(), fan, pw)
 
 
 NAMES = {-1: "NO_DATA", 0: "OK", 1: "WATCH", 2: "CLEAN", 3: "SERVICE"}
-BADGE = {"en": {-1: "NO DATA", 0: "OK", 1: "WATCH", 2: "CLEAN", 3: "SERVICE"},
-         "tr": {-1: "VERİ YOK", 0: "OK", 1: "İZLE", 2: "TEMİZLİK", 3: "SERVİS"}}
-LABELS = {"en": {-1: "Not enough data yet", 0: "Cooling is normal", 1: "Slight deviation, keep monitoring",
-                 2: "Dust cleaning recommended", 3: "Cooling insufficient: maintenance needed"},
-          "tr": {-1: "Henüz yeterli veri yok", 0: "Soğutma normal", 1: "Hafif sapma, izlemeye devam",
-                 2: "Toz temizliği önerilir", 3: "Soğutma yetersiz: bakım gerekli"}}
-ADVICE = {"en": {-1: "Start a game and play for at least 15 minutes; the first evaluation is made when the game closes.",
-                 0: "No maintenance needed. Keep measuring; the comparison gets more precise as the baseline builds up.",
-                 1: "Make sure the vents are not blocked; watch a few more sessions.",
-                 2: "Clean the fan and heatsink with compressed air, then press 'New baseline'.",
-                 3: "Start with a thorough dust cleaning; if it persists, have the thermal interface checked."},
-          "tr": {-1: "Bir oyun açın ve en az 15 dakika oynayın; ilk değerlendirme oyun kapanınca yapılır.",
-                 0: "Bakım gerekmiyor. Ölçüme devam edin; referans oluştukça karşılaştırma hassaslaşır.",
-                 1: "Havalandırmanın kapalı olmadığından emin olun; birkaç oturum daha izleyin.",
-                 2: "Fanı ve soğutucuyu basınçlı hava ile temizleyin, sonra 'Yeni referans' düğmesine basın.",
-                 3: "Önce kapsamlı toz temizliği; sorun sürerse termal arayüzü kontrol ettirin."}}
+VKEY = {-1: "na", 0: "ok", 1: "watch", 2: "clean", 3: "service"}
 
 # ---- history: 60 days, 14 sessions / geçmiş: 60 gün, 14 oturum ----
 HIST = []
@@ -179,22 +163,18 @@ def overall(lang):
     if last:
         reason_abs = abs_reason(lang, last['ss_soc'], last['ss_fan'], last['ss_power'])
     else:
-        reason_abs = L(lang, "No recorded session yet.", "Henüz kayıtlı oturum yok.")
+        reason_abs = X("no_session", lang, (CFG["warmup_s"] + CFG["min_ss_s"] + 59) // 60)
     if bv:
-        d, m, e, r, u = td(drift), tc(mean), td(sd), tc(rc), tsym()
-        reason_rel = L(lang, f"Cooling index {d:+.1f}{u} vs. baseline (baseline {m:.1f} ± {e:.1f}, last {len(recent)} sessions {r:.1f}).",
-                             f"Soğutma indeksi referansa göre {d:+.1f}{u} (referans {m:.1f} ± {e:.1f}, son {len(recent)} oturum {r:.1f}).")
+        reason_rel = X("rel", lang, td(drift), tsym(), tc(mean), td(sd), len(recent), tc(rc))
     else:
-        reason_rel = L(lang, f"Building the baseline: {len(base)}/{CFG['baseline_sessions']} sessions. Play a few more games.",
-                             f"Referans oluşuyor: {len(base)}/{CFG['baseline_sessions']} oturum. Birkaç oyun daha oynayın.")
+        reason_rel = X("building", lang, len(base), CFG["baseline_sessions"])
     if trend_valid:
-        worse = L(lang, " Cooling is getting worse over time.", " Soğutma zamanla kötüleşiyor.") if slope >= 2 else ""
-        trend = L(lang, f"Trend over {len(hs)} sessions: {td(slope):+.1f}{tsym()} per 30 days.{worse}",
-                        f"Eğilim: {len(hs)} oturum üzerinden {td(slope):+.1f}{tsym()} / 30 gün.{worse}")
+        worse = X("trend_worse", lang) if slope >= 2 else ""
+        trend = X("trend", lang, len(hs), td(slope), tsym(), worse)
     else:
-        trend = L(lang, "Not enough data for a trend (needs at least 6 sessions over 14 days).",
-                        "Eğilim için yeterli veri yok (en az 6 oturum ve 14 gün).")
-    return dict(verdict=v, name=NAMES[v], badge=BADGE[lang][v], label=LABELS[lang][v], advice=ADVICE[lang][v],
+        trend = X("trend_none", lang)
+    k = VKEY[v]
+    return dict(verdict=v, name=NAMES[v], badge=X("badge_" + k, lang), label=X("label_" + k, lang), advice=X("advice_" + k, lang),
                 verdict_abs=vabs, reason_abs=reason_abs, verdict_rel=vrel, reason_rel=reason_rel, trend_text=trend,
                 trend_valid=trend_valid, trend_per_30d=slope, drift=drift, recent_cdi=rc, recent_n=len(recent),
                 baseline=dict(valid=bv, n=len(base), need=CFG["baseline_sessions"], cdi_mean=mean, cdi_sd=sd,
@@ -254,8 +234,7 @@ def live_summary(lang):
         reason = abs_reason(lang, soc, fan, pw)
     else:
         need = (CFG["warmup_s"] + CFG["min_ss_s"] + 59) // 60
-        reason = L(lang, f"Not enough steady-state data: at least {need} min of continuous play is needed.",
-                         f"Kararlı durum verisi yetersiz: en az {need} dk kesintisiz oyun gerekli.")
+        reason = X("not_steady", lang, need)
     live = dict(start_ms=int(SESSION_START * 1000), start="", epoch=EPOCH, title="PPSA01234", dur_s=int(el), ss_valid=valid,
                 ss_samples=len(ss), ss_soc=soc if valid else None, ss_cpu=soc + 6 if valid else None, ss_fan=fan if valid else None,
                 ss_power=pw if valid else None, ss_fps=59.1 if valid else None, max_soc=max((s["soc_c"] for s in RING), default=None),
@@ -266,7 +245,7 @@ def live_summary(lang):
 
 def query_lang(q):
     v = q.get("lang", [""])[0].lower()
-    return v if v in ("en", "tr") else console_lang()
+    return v if v in CODES else console_lang()
 
 
 class H(BaseHTTPRequestHandler):
@@ -291,7 +270,7 @@ class H(BaseHTTPRequestHandler):
             ok = L(lang, "ok", "var")
             symbols = (f"CpuTemp:{ok} SocSensor:{ok} FanDuty:{ok} SocPower:{ok} BigApp:{ok} SysLang:{ok} "
                        + L(lang, f"(SIMULATION: {MODE})", f"(SİMÜLASYON: {MODE})"))
-            return self._json(dict(app="ps5td", version="0.2.1-sim", pid=os.getpid(), fw="11.60", ip="127.0.0.1",
+            return self._json(dict(app="ps5td", version="0.2.2-sim", pid=os.getpid(), fw="11.60", ip="127.0.0.1",
                                    uptime_s=int(time.time() - T0), lang=lang, console_lang=console_lang(), config_lang=CFG["lang"], temp_unit=CFG["temp_unit"],
                                    symbols=symbols, dce=L(lang, "reading the flip counter", "flip sayacı okunuyor"),
                                    samples_total=len(RING), history_n=len(HIST), epoch=EPOCH, epoch_since_ms=0, now=RING[-1],
@@ -327,7 +306,7 @@ class H(BaseHTTPRequestHandler):
                 if "=" not in line: bad += 1; continue
                 k, v = [x.strip() for x in line.split("=", 1)]
                 if k == "lang":
-                    if v.lower() in ("auto", "en", "tr"): CFG["lang"] = v.lower()
+                    if v.lower() in ["auto"] + CODES: CFG["lang"] = v.lower()
                     else: bad += 1
                 elif k == "temp_unit":
                     if parse_unit(v): CFG["temp_unit"] = parse_unit(v)
