@@ -64,13 +64,13 @@ try {
 
     # --- sources (same as the Makefile) -------------------------------------
     $srcs = @('src/main.c', 'src/platform.c', 'src/probe.c', 'src/sampler.c', 'src/http.c',
-              'src/analysis.c', 'src/history.c', 'src/config.c', 'src/log.c', 'src/util.c', 'src/i18n.c')
-    $gen = 'gen/web_index.c'
+              'src/tile.c', 'src/analysis.c', 'src/history.c', 'src/config.c', 'src/log.c', 'src/util.c', 'src/i18n.c')
+    $gen = @('gen/web_index.c', 'gen/icon0.c')
 
     $cflags = @('-Os', '-std=gnu11', '-Wall', '-Wextra', '-Isrc', '-ffunction-sections', '-fdata-sections',
                 '-fno-asynchronous-unwind-tables', '-fno-unwind-tables')
     $ldflags = @('-Wl,--gc-sections')
-    $ldadd = @('-lkernel_sys', '-lkernel', '-lSceSystemService', '-lpthread')
+    $ldadd = @('-lkernel_sys', '-lkernel', '-lSceSystemService', '-lSceAppInstUtil', '-lpthread')
 
     # common flags added by the bin/prospero-clang wrapper
     $common = @('-target', 'x86_64-sie-ps5',
@@ -89,8 +89,9 @@ try {
 
     # --- 1) embed the web UI as a C array ------------------------------------
     New-Item -ItemType Directory -Force 'gen', 'build' | Out-Null
-    Write-Host '[1/3] web/index.html -> gen/web_index.c'
-    Run @($python, 'tools/gen_assets.py', 'web/index.html', $gen, 'web_index_html')
+    Write-Host '[1/3] web/index.html -> gen/web_index.c, assets/icon0.png -> gen/icon0.c'
+    Run @($python, 'tools/gen_assets.py', 'web/index.html', 'gen/web_index.c', 'web_index_html')
+    Run @($python, 'tools/gen_assets.py', 'assets/icon0.png', 'gen/icon0.c', 'icon0_png')
 
     # --- 2) compile ----------------------------------------------------------
     Write-Host '[2/3] compiling / derleniyor'

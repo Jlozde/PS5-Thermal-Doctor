@@ -18,7 +18,7 @@ $testRc = $LASTEXITCODE
 
 Write-Host "== 3/3 Syntax check of the PS5 files / PS5 dosyaları sözdizimi denetimi" -ForegroundColor Cyan
 gcc -fsyntax-only -std=gnu11 -Wall -Wextra -Isrc -Itest/stubs -include test/stubs/syntax_compat.h `
-  src/platform.c src/http.c src/sampler.c src/probe.c src/main.c
+  src/platform.c src/http.c src/sampler.c src/probe.c src/main.c src/tile.c
 $synRc = $LASTEXITCODE
 
 if ($testRc -ne 0 -or $synRc -ne 0) { Write-Host "FAILED / BAŞARISIZ (tests=$testRc, syntax=$synRc)" -ForegroundColor Red; exit 1 }

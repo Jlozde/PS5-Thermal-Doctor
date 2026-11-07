@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #define PS5TD_NAME          "PS5 Thermal Doctor"
-#define PS5TD_VERSION       "0.2.2"
+#define PS5TD_VERSION       "0.2.3"
 #define PS5TD_PROCESS_NAME  "ps5td.elf"
 
 #define PS5TD_DATA_DIR      "/data/ps5td"
@@ -65,6 +65,7 @@ typedef struct {
   int      notify_startup;
   int      notify_session;
   int      notify_live_warn;
+  int      home_tile;         /* 1 = add the PS5 home-screen tile if missing */
   unsigned warmup_s;          /* warm-up skipped at session start            */
   unsigned min_ss_s;          /* minimum steady-state time for a verdict     */
   unsigned min_session_s;     /* shorter sessions are not recorded           */

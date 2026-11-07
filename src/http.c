@@ -19,6 +19,7 @@
  */
 #include "http.h"
 #include "analysis.h"
+#include "tile.h"
 #include "config.h"
 #include "i18n.h"
 #include "texts.h"
@@ -43,6 +44,8 @@
 
 extern const unsigned char web_index_html[];
 extern const unsigned int  web_index_html_len;
+extern const unsigned char icon0_png[];
+extern const unsigned int  icon0_png_len;
 
 #define MAX_CONN  8
 #define HDR_MAX   8192
@@ -335,6 +338,10 @@ h_status(int fd, const char *query) {
   jb_printf(&j, ",\"lang\":\"%s\",\"console_lang\":\"%s\",\"config_lang\":\"%s\",\"temp_unit\":\"%s\"",
             i18n_code(lang), i18n_code(i18n_get()), i18n_code(cfg.lang), i18n_unit_code(cfg.temp_unit));
   jb_printf(&j, ",\"uptime_s\":%llu", (unsigned long long)((util_mono_ms() - g_start_ms) / 1000ULL));
+  unsigned tcode, tport, twant;
+  int tstate = tile_status(&tcode, &tport, &twant);
+  jb_printf(&j, ",\"tile\":\"%s\",\"tile_code\":%u,\"tile_port\":%u,\"tile_want\":%u",
+            tile_state_name(tstate), tcode, tport, twant);
   jb_puts(&j, ",\"symbols\":"); jb_str(&j, plat_symbols_text(lang));
   jb_puts(&j, ",\"dce\":"); jb_str(&j, plat_dce_text(lang));
   jb_printf(&j, ",\"samples_total\":%u,\"history_n\":%u,\"epoch\":%u,\"epoch_since_ms\":%llu",
@@ -476,6 +483,8 @@ handle(int fd) {
   int get = strcmp(r.method, "GET") == 0, post = strcmp(r.method, "POST") == 0;
   if(strcmp(r.path, "/") == 0 || strcmp(r.path, "/index.html") == 0) {
     respond(fd, 200, "text/html; charset=utf-8", web_index_html, web_index_html_len);
+  } else if((strcmp(r.path, "/icon.png") == 0 || strcmp(r.path, "/favicon.ico") == 0) && get) {
+    respond(fd, 200, "image/png", icon0_png, icon0_png_len);
   } else if(strcmp(r.path, "/api/status") == 0 && get) {
     h_status(fd, r.query);
   } else if(strcmp(r.path, "/api/live") == 0 && get) {

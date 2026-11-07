@@ -17,6 +17,7 @@
 #include "probe.h"
 #include "ps5td.h"
 #include "sampler.h"
+#include "tile.h"
 #include "util.h"
 
 #include <arpa/inet.h>
@@ -145,6 +146,8 @@ main(int argc, char **argv) {
       if(cfg.notify_startup)
         plat_notify(TX_NOTIFY_START(i18n_get()),
                     PS5TD_NAME, PS5TD_VERSION, ip, cfg.http_port);
+      /* After the port is open: the tile opens this page. */
+      if(cfg.home_tile) tile_start(cfg.http_port);
     }
     http_run(srv);   /* does not return */
   }

@@ -35,7 +35,7 @@ T0 = time.time()
 random.seed(7)
 
 CFG = dict(lang="auto", temp_unit="c", http_port=PORT, sample_ms=1000, csv_every_s=5, fps_enabled=1, escalate=1,
-           notify_startup=1, notify_session=1, notify_live_warn=1, warmup_s=600, min_ss_s=300, min_session_s=180,
+           notify_startup=1, notify_session=1, notify_live_warn=1, home_tile=1, warmup_s=600, min_ss_s=300, min_session_s=180,
            k_fan=0.30, k_pow=0.25, watch_drift=4.0, clean_drift=8.0, service_drift=14.0,
            abs_watch_fan=60.0, abs_watch_soc=76.0, abs_clean_fan=70.0, abs_clean_soc=80.0,
            abs_service_fan=85.0, abs_service_soc=86.0, hot_soc_c=95.0, baseline_sessions=5,
@@ -46,7 +46,7 @@ LIMITS = dict(http_port=(1024, 65535), sample_ms=(250, 10000), csv_every_s=(1, 6
               clean_drift=(0.5, 60), service_drift=(0.5, 80), abs_watch_fan=(0, 100), abs_clean_fan=(0, 100),
               abs_service_fan=(0, 100), abs_watch_soc=(30, 130), abs_clean_soc=(30, 130), abs_service_soc=(30, 130),
               hot_soc_c=(60, 130), baseline_sessions=(1, 50), recent_sessions=(1, 20), keep_sessions=(5, 500))
-BOOLS = ("fps_enabled", "escalate", "notify_startup", "notify_session", "notify_live_warn")
+BOOLS = ("fps_enabled", "escalate", "notify_startup", "notify_session", "notify_live_warn", "home_tile")
 EPOCH = 0
 LOG = []  # (time, en, tr)
 
@@ -264,14 +264,17 @@ class H(BaseHTTPRequestHandler):
         if u.path in ("/", "/index.html"):
             with open(os.path.join(ROOT, "web", "index.html"), "rb") as f:
                 return self._send(200, "text/html; charset=utf-8", f.read())
+        if u.path in ("/icon.png", "/favicon.ico"):
+            with open(os.path.join(ROOT, "assets", "icon0.png"), "rb") as f:
+                return self._send(200, "image/png", f.read())
         if u.path == "/api/status":
             lang = query_lang(q)
             live, lv, reason = live_summary(lang)
             ok = L(lang, "ok", "var")
             symbols = (f"CpuTemp:{ok} SocSensor:{ok} FanDuty:{ok} SocPower:{ok} BigApp:{ok} SysLang:{ok} "
                        + L(lang, f"(SIMULATION: {MODE})", f"(SİMÜLASYON: {MODE})"))
-            return self._json(dict(app="ps5td", version="0.2.2-sim", pid=os.getpid(), fw="11.60", ip="127.0.0.1",
-                                   uptime_s=int(time.time() - T0), lang=lang, console_lang=console_lang(), config_lang=CFG["lang"], temp_unit=CFG["temp_unit"],
+            return self._json(dict(app="ps5td", version="0.2.3-sim", pid=os.getpid(), fw="11.60", ip="127.0.0.1",
+                                   uptime_s=int(time.time() - T0), tile="present" if CFG["home_tile"] else "off", tile_code=0, tile_port=PORT, tile_want=PORT, lang=lang, console_lang=console_lang(), config_lang=CFG["lang"], temp_unit=CFG["temp_unit"],
                                    symbols=symbols, dce=L(lang, "reading the flip counter", "flip sayacı okunuyor"),
                                    samples_total=len(RING), history_n=len(HIST), epoch=EPOCH, epoch_since_ms=0, now=RING[-1],
                                    session=dict(active=True, title="PPSA01234", dur_s=int(time.time() - SESSION_START), live=live,

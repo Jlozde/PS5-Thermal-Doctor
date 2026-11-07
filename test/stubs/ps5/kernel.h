@@ -16,4 +16,6 @@ intptr_t kernel_get_root_vnode(void);
 int      kernel_set_proc_rootdir(pid_t pid, intptr_t vnode);
 int      kernel_set_proc_jaildir(pid_t pid, intptr_t vnode);
 uint32_t kernel_get_fw_version(void);
+int      kernel_dynlib_handle(pid_t pid, const char *basename, uint32_t *handle);
+intptr_t kernel_dynlib_resolve(pid_t pid, uint32_t handle, const char *nid);
 #endif

@@ -86,6 +86,15 @@ Payload ikinci kez gönderilirse eski örnek kendiliğinden durdurulur: pid'i po
 - Varsayılan Celsius'tur. Fahrenheit'ı Ayarlar sekmesinden seçin ya da `config.ini`'de `temp_unit = f` yazın.
 - Birim web arayüzünü ve PS5 bildirimlerini değiştirir. Günlük ve `config.ini`'deki eşikler her zaman °C kalır; Ayarlar sekmesi bunları gösterirken dönüştürür.
 
+## Ana ekran kutucuğu
+
+- Payload başlarken kutucuk yoksa PS5 ana ekranına **PS5 Thermal Doctor** eklenir. Seçildiğinde PS5 tarayıcısında `http://127.0.0.1:8088` (web arayüzü portu) açılır. Kutucukta program yoktur: payload, eskisi gibi her konsol yeniden başlatmasından sonra gönderilmelidir.
+- Nasıl: `param.json` ve `icon0.png` dosyaları `/user/app/FAKE08088/sce_sys/` altına yazılır ve sistemden bu klasörü `sceAppInstUtilAppInstallTitleDir` ile kaydetmesi istenir. websrv, ShadowMountPlus ve diğer homebrew başlatıcıları kutucuklarını aynı yolla ekler. Toplu çağrı `sceAppInstUtilAppInstallAll` hiç kullanılmaz, çünkü `/user/app` altında bekleyen başka oyunları da kaydederdi.
+- Sonuç, Ayarlar sekmesindeki Bakım kartının altında ve günlükte görünür.
+- Kapatmak için Ayarlar sekmesinde **Ana ekran kutucuğu** seçeneğini kaldırın (`home_tile = 0`), sonra kutucuğu PS5'te silin (Seçenekler → Sil). Ayar açıkken silinen kutucuk bir sonraki açılışta geri gelir.
+- Kutucuk, oluşturulduğu portu açar. `http_port` değiştirildikten sonra yenisi için kutucuğu silip payload'ı yeniden başlatın; Ayarlar sekmesi bunu hatırlatır.
+- Firmware 12.00 ve sonrası bu başlık bazlı çağrıyı artık sunmuyor. Orada payload kutucuğu atlar ve bunu belirtir.
+
 ## Otomatik başlatma (etaHEN)
 
 ELF'i `/data/etaHEN/payloads/` altına kopyalayın (FTP, port 1337). etaHEN Toolbox → Payloads menüsünde dosyayı seçip **auto-start**'ı açın; etaHEN her açılışta yükler. Oyun açmadan önce yüklenmiş olması yeterlidir. Oyun sırasında da yüklenebilir; o oturum kısmi kaydedilir.
@@ -98,6 +107,7 @@ ELF'i `/data/etaHEN/payloads/` altına kopyalayın (FTP, port 1337). etaHEN Tool
 | Fan `–` | `sceKernelGetCurrentFanDuty` bu firmware'de yok; günlükte "FanDuty:YOK" yazar. |
 | FPS `–` | `/dev/dce` açılamadı (günlükte errno). Yetki yükseltme kapalıysa `escalate = 1` deneyin. |
 | Güç `–` | `sceKernelGetSocPowerConsumption` yok ya da beklenmeyen yerleşimde (günlüğe bakın). |
+| Ana ekranda kutucuk yok | Bakım kartının altındaki satıra ve günlüğe bakın. Kod varsa sistem kabul etmemiştir; bir sonraki açılışta yeniden denenir. Yetki yükseltme kapalıysa `escalate = 1` deneyin. |
 | Oyun açıkken "yok" görünüyor | `sceSystemServiceGetAppIdOfRunningBigApp` yanıt vermiyor. pfsmnt yedeği de boşsa günlüğü paylaşın. |
 | Web arayüzü açılmıyor | PS5 ile aynı ağda mısınız? Port `config.ini`'de değiştirilmiş olabilir. |
 | Metinler yanlış dilde | Web arayüzü: başlıktaki dil menüsü. Bildirimler: Ayarlar sekmesindeki **Konsol dili** (örneğin `lang = tr`). |

@@ -4,6 +4,17 @@
 
 Downloads are on the [Releases](https://github.com/Jlozde/PS5-Thermal-Doctor/releases) page.
 
+## 0.2.3 (2026-11-07)
+
+### Added
+- **Logo.** A fan with a pulse line across it, in the colours of the web UI. It is in the README, in the browser tab and in the web UI header.
+- **Home-screen tile.** When the payload starts and the tile is missing, it adds PS5 Thermal Doctor to the PS5 home screen. The tile opens the web UI in the PS5 browser. It is registered with `sceAppInstUtilAppInstallTitleDir`, like other homebrew launchers; the batch install call is never used.
+- `home_tile = 1 | 0` in `config.ini` and in the Settings tab (on by default). The Maintenance card shows the tile state.
+- `tile`, `tile_code`, `tile_port` and `tile_want` fields in `/api/status`; `/icon.png` serves the icon.
+
+### Changed
+- The ELF links `libSceAppInstUtil` and embeds the 512 × 512 icon (about 40 KB).
+
 ## 0.2.2 (2026-11-07)
 
 ### Added

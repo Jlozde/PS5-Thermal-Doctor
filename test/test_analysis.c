@@ -284,6 +284,11 @@ test_persistence(const config_t *c) {
         "bad lines are counted, values clamped (bad=%d port=%u)", bad, b.http_port);
   bad = config_apply_text(&b, "temp_unit = C\n");
   CHECK(bad == 0 && b.temp_unit == TEMP_C, "temp_unit = C");
+  CHECK(b.home_tile == 1, "home_tile is on by default");
+  bad = config_apply_text(&b, "home_tile = 0\n");
+  CHECK(bad == 0 && b.home_tile == 0, "home_tile = 0");
+  config_to_text(&b, txt, sizeof(txt));
+  CHECK(strstr(txt, "home_tile = 0") != NULL, "home_tile = 0 is written back");
   bad = config_apply_text(&b, "lang = ko\n");
   CHECK(bad == 0 && b.lang == LANG_KO, "lang = ko");
   config_to_text(&b, txt, sizeof(txt));

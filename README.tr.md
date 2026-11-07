@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/logo.svg" width="128" height="128" alt="PS5 Thermal Doctor logo"></p>
+
 # PS5 Thermal Doctor
 
 [English](README.md) · **Türkçe**
@@ -29,8 +31,9 @@ Toz aylar içinde yavaş yavaş birikir. PS5 bu konuda sizi uyarmaz: fan kontrol
 
 Yalnızca sıcaklığa bakarak bu yakalanamaz. PS5 Thermal Doctor **fan devrini, sıcaklığı ve gücü birlikte** okur ve konsolun aynı yük için ne kadar soğutma çabası harcadığını hesaplar. Bu çaba konsolun kendi referansına göre artmaya başladığında, ısınma sorunu çıkmadan çok önce temizlik zamanının geldiğini söyler.
 
-- **Yalnızca okur.** Overlay yok, fan kontrolü yok, ayar değiştirme yok. Sensörleri okur ve konsolda hiçbir şeyi değiştirmez.
-- **Sonuç baktığınız yerde.** Oyun kapanınca PS5 bildirimi, telefonda veya PC'de web arayüzü.
+- **Yalnızca okur.** Overlay yok, fan kontrolü yok, ayar değiştirme yok. Sensörleri okur, konsol ayarlarını değiştirmez. Eklediği tek şey kendi ana ekran kutucuğudur; o da kapatılabilir.
+- **Sonuç baktığınız yerde.** Oyun kapanınca PS5 bildirimi; telefonda, PC'de ya da PS5'in kendisinde web arayüzü.
+- **Ana ekrandan açılır.** Payload başlarken kutucuk yoksa PS5 ana ekranına bir PS5 Thermal Doctor kutucuğu ekler. Kutucuk web arayüzünü PS5 tarayıcısında açar.
 - **Uygulamada sekiz dil.** Web arayüzü, kararlar ve PS5 bildirimleri İngilizce, Türkçe, Almanca, Fransızca, İspanyolca, Rusça, Korece ve Basitleştirilmiş Çince olarak kullanılabilir. Günlük ve `config.ini` açıklamaları İngilizce ve Türkçe kalır.
 - **°C veya °F.** Varsayılan Celsius; Ayarlar sekmesinden Fahrenheit seçilebilir.
 
@@ -58,7 +61,7 @@ Temizlik yaptıktan sonra web arayüzünün Ayarlar sekmesindeki **"Yeni referan
 
 ![Ayarlar sekmesi](docs/images/settings.tr.png)
 
-<sub>Ayarlar sekmesi: konsol dili, sıcaklık birimi, bildirimler, ölçüm ve tüm karar eşikleri, her biri kısa bir açıklamayla. Sıcaklıklar varsayılan olarak °C gösterilir, °F'ye geçilebilir.</sub>
+<sub>Ayarlar sekmesi: konsol dili, sıcaklık birimi, ana ekran kutucuğu, bildirimler, ölçüm ve tüm karar eşikleri, her biri kısa bir açıklamayla. Sıcaklıklar varsayılan olarak °C gösterilir, °F'ye geçilebilir.</sub>
 
 ## Ne okur
 
@@ -80,7 +83,7 @@ Temizlik yaptıktan sonra web arayüzünün Ayarlar sekmesindeki **"Yeni referan
    powershell -ExecutionPolicy Bypass -File .\tools\send_payload.ps1 -Ip 192.168.1.50 -Elf .\ps5-thermal-doctor.elf -Watch
    ```
    Linux'ta: `nc -q0 192.168.1.50 9021 < ps5-thermal-doctor.elf`
-4. PS5 ekranında "PS5 Thermal Doctor başladı · http://IP:8088" bildirimi görünür. O adresi telefon veya PC tarayıcısında açın.
+4. PS5 ekranında "PS5 Thermal Doctor başladı · http://IP:8088" bildirimi görünür. O adresi telefon veya PC tarayıcısında açın. İlk açılışta PS5 ana ekranına bir **PS5 Thermal Doctor** kutucuğu da eklenir; aynı sayfayı konsolda açar.
 5. Bir oyun açıp en az **15 dakika** oynayın. Oyun kapanınca özet bildirimi gelir.
 
 Payload her konsol yeniden başlatmasında tekrar gönderilmelidir. etaHEN bunu otomatik yapabilir: ELF'i `/data/etaHEN/payloads/` altına kopyalayıp Toolbox'ta auto-start'ı açın.
@@ -105,6 +108,7 @@ Bellekteki günlük her satırı İngilizce ve Türkçe tutar. Bu yüzden web ar
 /data/ps5td/sessions/*.csv  oturum başına 5 sn'lik ham veri
 /data/ps5td/state.ini       referans sayacı
 /data/ps5td/ps5td.log       günlük
+/user/app/FAKE08088/         ana ekran kutucuğu (param.json, icon0.png), sisteme kayıtlı
 ```
 
 ## Proje yapısı
@@ -117,12 +121,15 @@ src/log.c            İngilizce / Türkçe günlük (halka tampon + dosya)
 src/platform.c       PS5 donanım erişimi (sensörler, dce, bildirim, sistem dili)
 src/sampler.c        1 Hz örnekleme, oturum yönetimi, CSV
 src/http.c           web sunucusu + JSON API
+src/tile.c           ana ekran kutucuğu
 web/index.html       web arayüzü (ELF'e gömülür)
+assets/              logo (logo.svg) ve ana ekran simgesi (icon0.png, ELF'e gömülür)
 tools/build.ps1      WSL'siz Windows derlemesi
 tools/send_payload.ps1   ELF'i elfldr'a gönderir
 tools/devserver.py   arayüzü PC'de denemek için sahte sunucu
 tools/i18n_texts.py  uygulama metinlerinin çevirileri (tek kaynak)
 tools/gen_i18n.py    src/texts.h dosyasını ve web/index.html içindeki metin tablosunu yazar
+tools/make_logo.py   logoyu çizer ve assets/icon0.png dosyasını üretir
 test/                PC testleri ve sözdizimi denetimi (test\host-check.ps1)
 docs/                kurulum rehberi, teşhis mantığı, README görselleri
 ```

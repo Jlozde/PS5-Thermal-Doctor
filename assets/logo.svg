@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>PS5 Thermal Doctor</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b2638"/>
+      <stop offset="1" stop-color="#0e1116"/>
+    </linearGradient>
+    <linearGradient id="blade" x1="0" y1="-1" x2="0" y2="0" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#7cc0ff"/>
+      <stop offset="1" stop-color="#3b82d6"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="104" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="196" fill="none" stroke="#2c3b52" stroke-width="16"/>
+  <g transform="translate(256 256)">
+      <path d="M 0,-46 C 34,-70 74,-118 52,-168 C 26,-176 -8,-170 -26,-150 C -6,-120 -14,-78 -30,-50 Z" transform="rotate(0.0)" fill="url(#blade)"/>
+      <path d="M 0,-46 C 34,-70 74,-118 52,-168 C 26,-176 -8,-170 -26,-150 C -6,-120 -14,-78 -30,-50 Z" transform="rotate(51.4)" fill="url(#blade)"/>
+      <path d="M 0,-46 C 34,-70 74,-118 52,-168 C 26,-176 -8,-170 -26,-150 C -6,-120 -14,-78 -30,-50 Z" transform="rotate(102.9)" fill="url(#blade)"/>
+      <path d="M 0,-46 C 34,-70 74,-118 52,-168 C 26,-176 -8,-170 -26,-150 C -6,-120 -14,-78 -30,-50 Z" transform="rotate(154.3)" fill="url(#blade)"/>
+      <path d="M 0,-46 C 34,-70 74,-118 52,-168 C 26,-176 -8,-170 -26,-150 C -6,-120 -14,-78 -30,-50 Z" transform="rotate(205.7)" fill="url(#blade)"/>
+      <path d="M 0,-46 C 34,-70 74,-118 52,-168 C 26,-176 -8,-170 -26,-150 C -6,-120 -14,-78 -30,-50 Z" transform="rotate(257.1)" fill="url(#blade)"/>
+      <path d="M 0,-46 C 34,-70 74,-118 52,-168 C 26,-176 -8,-170 -26,-150 C -6,-120 -14,-78 -30,-50 Z" transform="rotate(308.6)" fill="url(#blade)"/>
+    <circle r="44" fill="#0e1116" stroke="#2c3b52" stroke-width="8"/>
+  </g>
+  <polyline points="28,300 150,300 176,270 198,300 222,300 252,120 290,410 318,262 336,300 484,300" fill="none" stroke="#0e1116" stroke-width="46"
+            stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="28,300 150,300 176,270 198,300 222,300 252,120 290,410 318,262 336,300 484,300" fill="none" stroke="#2ecc71" stroke-width="26"
+            stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

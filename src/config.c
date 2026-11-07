@@ -30,6 +30,8 @@ static const citem_t g_items[] = {
   CI("temp_unit",         CT_UNIT,  temp_unit,         "Temperature unit: c (Celsius) or f (Fahrenheit); thresholds below stay in °C",
                                                        "Sıcaklık birimi: c (Celsius) veya f (Fahrenheit); aşağıdaki eşikler °C kalır"),
   CI("http_port",         CT_UINT,  http_port,         "Web UI port", "Web arayüzü portu"),
+  CI("home_tile",         CT_INT,   home_tile,         "1 = add a PS5 home-screen tile that opens the web UI, if it is missing",
+                                                       "1 = web arayüzünü açan PS5 ana ekran kutucuğunu ekle (yoksa)"),
   CI("sample_ms",         CT_UINT,  sample_ms,         "Sampling interval, ms (1000 recommended)",
                                                        "Örnekleme aralığı, ms (1000 önerilir)"),
   CI("csv_every_s",       CT_UINT,  csv_every_s,       "Write a session CSV line every N seconds",
@@ -82,6 +84,7 @@ config_defaults(config_t *c) {
   c->notify_startup    = 1;
   c->notify_session    = 1;
   c->notify_live_warn  = 1;
+  c->home_tile         = 1;
   c->warmup_s          = 600;
   c->min_ss_s          = 300;
   c->min_session_s     = 180;
@@ -137,6 +140,7 @@ config_sanitize(config_t *c) {
   c->notify_startup   = !!c->notify_startup;
   c->notify_session   = !!c->notify_session;
   c->notify_live_warn = !!c->notify_live_warn;
+  c->home_tile        = !!c->home_tile;
 }
 
 static int

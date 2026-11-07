@@ -86,6 +86,15 @@ If the payload is sent a second time, the old instance is stopped automatically:
 - Celsius by default. Choose Fahrenheit in the Settings tab, or set `temp_unit = f` in `config.ini`.
 - The unit changes the web UI and the PS5 notifications. The log and the thresholds in `config.ini` always stay in °C; the Settings tab converts them for display.
 
+## Home-screen tile
+
+- When the payload starts and the tile is missing, it adds **PS5 Thermal Doctor** to the PS5 home screen. Selecting it opens `http://127.0.0.1:8088` (the web UI port) in the PS5 browser. The tile holds no program: the payload still has to be sent after every console restart, as before.
+- How: the files `param.json` and `icon0.png` are written to `/user/app/FAKE08088/sce_sys/`, and the system is asked to register that folder with `sceAppInstUtilAppInstallTitleDir`. This is the same way websrv, ShadowMountPlus and other homebrew launchers add their tiles. The batch call `sceAppInstUtilAppInstallAll` is never used, because it would also register other titles waiting under `/user/app`.
+- The result is shown at the bottom of the Maintenance card in the Settings tab and in the log.
+- To turn it off, clear **Home screen tile** in the Settings tab (`home_tile = 0`), then delete the tile on the PS5 (Options → Delete). With the setting on, a deleted tile comes back at the next start.
+- The tile opens the port it was made with. After changing `http_port`, delete the tile and restart the payload to get a new one; the Settings tab reminds you.
+- Firmware 12.00 and later no longer offer the per-title call. There the payload skips the tile and says so.
+
 ## Auto-start (etaHEN)
 
 Copy the ELF to `/data/etaHEN/payloads/` (FTP on port 1337). In etaHEN Toolbox → Payloads, pick the file and enable **auto-start**; etaHEN then loads it at every boot. It only has to be loaded before you start a game. It can also be loaded during a game; that session is then recorded partially.
@@ -98,6 +107,7 @@ Copy the ELF to `/data/etaHEN/payloads/` (FTP on port 1337). In etaHEN Toolbox �
 | Fan shows `–` | `sceKernelGetCurrentFanDuty` is missing on this firmware; the log says "FanDuty:MISSING". |
 | FPS shows `–` | `/dev/dce` could not be opened (errno in the log). If privilege escalation is off, try `escalate = 1`. |
 | Power shows `–` | `sceKernelGetSocPowerConsumption` is missing or has an unexpected layout (see the log). |
+| No tile on the home screen | Check the line at the bottom of the Maintenance card and the log. A code means the system refused it; it is tried again at the next start. If privilege escalation is off, try `escalate = 1`. |
 | Game shows "none" while a game is open | `sceSystemServiceGetAppIdOfRunningBigApp` does not answer. If the pfsmnt fallback is empty too, share the log. |
 | Web UI does not open | Are you on the same network as the PS5? The port may have been changed in `config.ini`. |
 | Texts in the wrong language | Web UI: use the language menu in the header. Notifications: set **Console language** in the Settings tab (for example `lang = de`). |

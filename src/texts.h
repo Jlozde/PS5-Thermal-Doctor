@@ -371,4 +371,14 @@
   "%s\n알림 테스트: 웹 UI가 작동합니다.", \
   "%s\n通知测试：网页界面工作正常。")
 
+#define TX_NOTIFY_TILE(l) T8((l), \
+  "%s was added to the home screen.", \
+  "%s ana ekrana eklendi.", \
+  "%s wurde zum Startbildschirm hinzugefügt.", \
+  "%s a été ajouté à l'écran d'accueil.", \
+  "%s se ha añadido a la pantalla de inicio.", \
+  "%s добавлен на главный экран.", \
+  "%s이(가) 홈 화면에 추가되었습니다.", \
+  "%s 已添加到主屏幕。")
+
 #endif
