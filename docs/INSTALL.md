@@ -88,11 +88,11 @@ If the payload is sent a second time, the old instance is stopped automatically:
 
 ## Home-screen tile
 
-- When the payload starts and the tile is missing, it adds **PS5 Thermal Doctor** to the PS5 home screen. Selecting it opens `http://127.0.0.1:8088` (the web UI port) in the PS5 browser. The tile holds no program: the payload still has to be sent after every console restart, as before.
-- How: the files `param.json` and `icon0.png` are written to `/user/app/FAKE08088/sce_sys/`, and the system is asked to register that folder with `sceAppInstUtilAppInstallTitleDir`. This is the same way websrv, ShadowMountPlus and other homebrew launchers add their tiles. The batch call `sceAppInstUtilAppInstallAll` is never used, because it would also register other titles waiting under `/user/app`.
+- When the payload starts and the tile is missing, it adds **PS5 Thermal Doctor** to the media row of the PS5 home screen, next to the other apps. Selecting it opens `http://127.0.0.1:8088` (the web UI port) in the PS5 browser. The tile holds no program: the payload still has to be sent after every console restart, as before.
+- How: the files `param.json` (with `"applicationCategoryType": 65536`, the media row) and `icon0.png` are written to `/user/app/FAKE08088/sce_sys/`, and the system is asked to register that folder with `sceAppInstUtilAppInstallTitleDir`. This is the same way websrv, ShadowMountPlus and other homebrew launchers add their tiles. The batch call `sceAppInstUtilAppInstallAll` is never used, because it would also register other titles waiting under `/user/app`.
 - The result is shown at the bottom of the Maintenance card in the Settings tab and in the log.
 - To turn it off, clear **Home screen tile** in the Settings tab (`home_tile = 0`), then delete the tile on the PS5 (Options → Delete). With the setting on, a deleted tile comes back at the next start.
-- The tile opens the port it was made with. After changing `http_port`, delete the tile and restart the payload to get a new one; the Settings tab reminds you.
+- If the tile is out of date, for example after `http_port` was changed or when it was made by an older version, the payload writes its files again and registers it again at the next start. No notification is shown for that.
 - Firmware 12.00 and later no longer offer the per-title call. There the payload skips the tile and says so.
 
 ## Auto-start (etaHEN)

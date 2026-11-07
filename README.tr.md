@@ -33,7 +33,7 @@ Yalnızca sıcaklığa bakarak bu yakalanamaz. PS5 Thermal Doctor **fan devrini,
 
 - **Yalnızca okur.** Overlay yok, fan kontrolü yok, ayar değiştirme yok. Sensörleri okur, konsol ayarlarını değiştirmez. Eklediği tek şey kendi ana ekran kutucuğudur; o da kapatılabilir.
 - **Sonuç baktığınız yerde.** Oyun kapanınca PS5 bildirimi; telefonda, PC'de ya da PS5'in kendisinde web arayüzü.
-- **Ana ekrandan açılır.** Payload başlarken kutucuk yoksa PS5 ana ekranına bir PS5 Thermal Doctor kutucuğu ekler. Kutucuk web arayüzünü PS5 tarayıcısında açar.
+- **Ana ekrandan açılır.** Payload başlarken kutucuk yoksa PS5 ana ekranının medya bölümüne, diğer uygulamaların yanına bir PS5 Thermal Doctor kutucuğu ekler. Kutucuk web arayüzünü PS5 tarayıcısında açar.
 - **Uygulamada sekiz dil.** Web arayüzü, kararlar ve PS5 bildirimleri İngilizce, Türkçe, Almanca, Fransızca, İspanyolca, Rusça, Korece ve Basitleştirilmiş Çince olarak kullanılabilir. Günlük ve `config.ini` açıklamaları İngilizce ve Türkçe kalır.
 - **°C veya °F.** Varsayılan Celsius; Ayarlar sekmesinden Fahrenheit seçilebilir.
 
@@ -83,7 +83,7 @@ Temizlik yaptıktan sonra web arayüzünün Ayarlar sekmesindeki **"Yeni referan
    powershell -ExecutionPolicy Bypass -File .\tools\send_payload.ps1 -Ip 192.168.1.50 -Elf .\ps5-thermal-doctor.elf -Watch
    ```
    Linux'ta: `nc -q0 192.168.1.50 9021 < ps5-thermal-doctor.elf`
-4. PS5 ekranında "PS5 Thermal Doctor başladı · http://IP:8088" bildirimi görünür. O adresi telefon veya PC tarayıcısında açın. İlk açılışta PS5 ana ekranına bir **PS5 Thermal Doctor** kutucuğu da eklenir; aynı sayfayı konsolda açar.
+4. PS5 ekranında "PS5 Thermal Doctor başladı · http://IP:8088" bildirimi görünür. O adresi telefon veya PC tarayıcısında açın. İlk açılışta PS5 ana ekranının medya bölümüne bir **PS5 Thermal Doctor** kutucuğu da eklenir; aynı sayfayı konsolda açar.
 5. Bir oyun açıp en az **15 dakika** oynayın. Oyun kapanınca özet bildirimi gelir.
 
 Payload her konsol yeniden başlatmasında tekrar gönderilmelidir. etaHEN bunu otomatik yapabilir: ELF'i `/data/etaHEN/payloads/` altına kopyalayıp Toolbox'ta auto-start'ı açın.
@@ -123,7 +123,7 @@ src/sampler.c        1 Hz örnekleme, oturum yönetimi, CSV
 src/http.c           web sunucusu + JSON API
 src/tile.c           ana ekran kutucuğu
 web/index.html       web arayüzü (ELF'e gömülür)
-assets/              logo (logo.svg) ve ana ekran simgesi (icon0.png, ELF'e gömülür)
+assets/              logo (logo.svg), ana ekran simgesi (icon0.png, ELF'e gömülür), GitHub sosyal önizleme görseli
 tools/build.ps1      WSL'siz Windows derlemesi
 tools/send_payload.ps1   ELF'i elfldr'a gönderir
 tools/devserver.py   arayüzü PC'de denemek için sahte sunucu

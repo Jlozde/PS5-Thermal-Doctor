@@ -8,7 +8,7 @@
 
 ### Eklenenler
 - **Logo.** Web arayüzünün renklerinde, üzerinden nabız çizgisi geçen bir fan. README'de, tarayıcı sekmesinde ve web arayüzü başlığında yer alır.
-- **Ana ekran kutucuğu.** Payload başlarken kutucuk yoksa PS5 ana ekranına PS5 Thermal Doctor eklenir. Kutucuk web arayüzünü PS5 tarayıcısında açar. Diğer homebrew başlatıcıları gibi `sceAppInstUtilAppInstallTitleDir` ile kaydedilir; toplu kurulum çağrısı hiç kullanılmaz.
+- **Ana ekran kutucuğu.** Payload başlarken kutucuk yoksa PS5 ana ekranının medya bölümüne PS5 Thermal Doctor eklenir. Kutucuk web arayüzünü PS5 tarayıcısında açar. Güncel olmayan bir kutucuk (başka port, eski sürüm) bir sonraki açılışta yeniden kaydedilir. Diğer homebrew başlatıcıları gibi `sceAppInstUtilAppInstallTitleDir` ile kaydedilir; toplu kurulum çağrısı hiç kullanılmaz.
 - `config.ini` içinde ve Ayarlar sekmesinde `home_tile = 1 | 0` (varsayılan açık). Bakım kartı kutucuğun durumunu gösterir.
 - `/api/status` içinde `tile`, `tile_code`, `tile_port` ve `tile_want` alanları; `/icon.png` simgeyi sunar.
 

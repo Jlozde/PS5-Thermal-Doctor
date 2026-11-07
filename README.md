@@ -33,7 +33,7 @@ Looking at the temperature alone cannot catch this. PS5 Thermal Doctor reads **f
 
 - **Read-only.** No overlay, no fan control, no tuning. It reads sensors and never changes console settings. The only thing it adds is its own home-screen tile, which can be turned off.
 - **Results where you look.** A PS5 notification when the game closes, and a web UI on your phone, your PC or the PS5 itself.
-- **Opens from the home screen.** When the payload starts and the tile is missing, it adds a PS5 Thermal Doctor tile to the PS5 home screen. The tile opens the web UI in the PS5 browser.
+- **Opens from the home screen.** When the payload starts and the tile is missing, it adds a PS5 Thermal Doctor tile to the media row of the PS5 home screen, next to the other apps. The tile opens the web UI in the PS5 browser.
 - **Eight languages in the app.** The web UI, verdicts and PS5 notifications are available in English, Turkish, German, French, Spanish, Russian, Korean and Simplified Chinese. The log and the `config.ini` comments stay in English and Turkish.
 - **°C or °F.** Celsius by default; Fahrenheit can be chosen in the Settings tab.
 
@@ -83,7 +83,7 @@ After cleaning, the **"New baseline"** button in the Settings tab of the web UI 
    powershell -ExecutionPolicy Bypass -File .\tools\send_payload.ps1 -Ip 192.168.1.50 -Elf .\ps5-thermal-doctor.elf -Watch
    ```
    On Linux: `nc -q0 192.168.1.50 9021 < ps5-thermal-doctor.elf`
-4. The PS5 shows a "PS5 Thermal Doctor started · http://IP:8088" notification. Open that address in a phone or PC browser. On the first start a **PS5 Thermal Doctor** tile is also added to the PS5 home screen; it opens the same page on the console.
+4. The PS5 shows a "PS5 Thermal Doctor started · http://IP:8088" notification. Open that address in a phone or PC browser. On the first start a **PS5 Thermal Doctor** tile is also added to the media row of the PS5 home screen; it opens the same page on the console.
 5. Start a game and play for at least **15 minutes**. A summary notification arrives when the game closes.
 
 The payload has to be sent again after every console restart. etaHEN can start it automatically: copy the ELF to `/data/etaHEN/payloads/` and enable auto-start in the Toolbox.
@@ -123,7 +123,7 @@ src/sampler.c        1 Hz sampling, session handling, CSV
 src/http.c           web server + JSON API
 src/tile.c           home-screen tile
 web/index.html       web UI (embedded into the ELF)
-assets/              logo (logo.svg) and the home-screen icon (icon0.png, embedded into the ELF)
+assets/              logo (logo.svg), home-screen icon (icon0.png, embedded into the ELF), GitHub social preview
 tools/build.ps1      Windows build without WSL
 tools/send_payload.ps1   sends the ELF to elfldr
 tools/devserver.py   fake server for trying the UI on a PC

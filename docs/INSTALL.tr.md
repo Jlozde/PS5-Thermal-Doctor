@@ -88,11 +88,11 @@ Payload ikinci kez gönderilirse eski örnek kendiliğinden durdurulur: pid'i po
 
 ## Ana ekran kutucuğu
 
-- Payload başlarken kutucuk yoksa PS5 ana ekranına **PS5 Thermal Doctor** eklenir. Seçildiğinde PS5 tarayıcısında `http://127.0.0.1:8088` (web arayüzü portu) açılır. Kutucukta program yoktur: payload, eskisi gibi her konsol yeniden başlatmasından sonra gönderilmelidir.
-- Nasıl: `param.json` ve `icon0.png` dosyaları `/user/app/FAKE08088/sce_sys/` altına yazılır ve sistemden bu klasörü `sceAppInstUtilAppInstallTitleDir` ile kaydetmesi istenir. websrv, ShadowMountPlus ve diğer homebrew başlatıcıları kutucuklarını aynı yolla ekler. Toplu çağrı `sceAppInstUtilAppInstallAll` hiç kullanılmaz, çünkü `/user/app` altında bekleyen başka oyunları da kaydederdi.
+- Payload başlarken kutucuk yoksa PS5 ana ekranının medya bölümüne, diğer uygulamaların yanına **PS5 Thermal Doctor** eklenir. Seçildiğinde PS5 tarayıcısında `http://127.0.0.1:8088` (web arayüzü portu) açılır. Kutucukta program yoktur: payload, eskisi gibi her konsol yeniden başlatmasından sonra gönderilmelidir.
+- Nasıl: `param.json` (`"applicationCategoryType": 65536` ile, yani medya bölümü) ve `icon0.png` dosyaları `/user/app/FAKE08088/sce_sys/` altına yazılır ve sistemden bu klasörü `sceAppInstUtilAppInstallTitleDir` ile kaydetmesi istenir. websrv, ShadowMountPlus ve diğer homebrew başlatıcıları kutucuklarını aynı yolla ekler. Toplu çağrı `sceAppInstUtilAppInstallAll` hiç kullanılmaz, çünkü `/user/app` altında bekleyen başka oyunları da kaydederdi.
 - Sonuç, Ayarlar sekmesindeki Bakım kartının altında ve günlükte görünür.
 - Kapatmak için Ayarlar sekmesinde **Ana ekran kutucuğu** seçeneğini kaldırın (`home_tile = 0`), sonra kutucuğu PS5'te silin (Seçenekler → Sil). Ayar açıkken silinen kutucuk bir sonraki açılışta geri gelir.
-- Kutucuk, oluşturulduğu portu açar. `http_port` değiştirildikten sonra yenisi için kutucuğu silip payload'ı yeniden başlatın; Ayarlar sekmesi bunu hatırlatır.
+- Kutucuk güncel değilse, örneğin `http_port` değiştirildiyse ya da eski bir sürüm oluşturduysa, payload bir sonraki açılışta dosyalarını yeniden yazar ve kutucuğu yeniden kaydeder. Bunun için bildirim gösterilmez.
 - Firmware 12.00 ve sonrası bu başlık bazlı çağrıyı artık sunmuyor. Orada payload kutucuğu atlar ve bunu belirtir.
 
 ## Otomatik başlatma (etaHEN)

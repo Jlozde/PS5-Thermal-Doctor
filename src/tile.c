@@ -33,9 +33,12 @@
  *    /user/appmeta folder (measured on the test console), so the folder alone
  *    would register it again at every start. A tile the user deleted is
  *    added again at the next start unless home_tile = 0.
- *  - The tile opens the port it was made with. If http_port changes later,
- *    the status says so; deleting the tile and restarting the payload makes
- *    a new one.
+ *  - The tile sits in the media row ("applicationCategoryType": 65536, as
+ *    in ps5-cooling-system-center-pro's media tile), next to the other apps,
+ *    not among the games.
+ *  - When the param.json on disk differs from the one this run would write
+ *    (an older version, another http_port), the files are written again and
+ *    the tile is registered again, without a notification.
  */
 #include "tile.h"
 #include "i18n.h"
@@ -180,19 +183,38 @@ write_file(const char *path, const void *data, size_t len) {
   return 0;
 }
 
+/* The param.json this run wants: media row, deeplink to the web UI port. */
+static int
+param_text(char *buf, size_t n, unsigned port) {
+  return snprintf(buf, n,
+                  "{\n"
+                  "  \"titleId\": \"" TILE_ID "\",\n"
+                  "  \"applicationCategoryType\": 65536,\n"
+                  "  \"deeplinkUri\": \"http://127.0.0.1:%u\",\n"
+                  "  \"localizedParameters\": {\n"
+                  "    \"defaultLanguage\": \"en-US\",\n"
+                  "    \"en-US\": { \"titleName\": \"" PS5TD_NAME "\" }\n"
+                  "  }\n"
+                  "}\n", port);
+}
+
+/* Is the param.json on disk the one this run would write? */
+static int
+param_current(unsigned port) {
+  char want[512], have[600];
+  int wn = param_text(want, sizeof(want), port);
+  int fd = open(TILE_PARAM, O_RDONLY);
+  if(fd < 0) return 0;
+  ssize_t hn = read(fd, have, sizeof(have));
+  close(fd);
+  return hn == wn && memcmp(want, have, (size_t)wn) == 0;
+}
+
 /* Writes /user/app/<id>/sce_sys/{param.json,icon0.png}. 0 or errno. */
 static int
 stage(unsigned port) {
   char param[512];
-  int n = snprintf(param, sizeof(param),
-                   "{\n"
-                   "  \"titleId\": \"" TILE_ID "\",\n"
-                   "  \"deeplinkUri\": \"http://127.0.0.1:%u\",\n"
-                   "  \"localizedParameters\": {\n"
-                   "    \"defaultLanguage\": \"en-US\",\n"
-                   "    \"en-US\": { \"titleName\": \"" PS5TD_NAME "\" }\n"
-                   "  }\n"
-                   "}\n", port);
+  int n = param_text(param, sizeof(param), port);
   int fd = open(TILE_STAGING, O_WRONLY | O_CREAT | O_TRUNC, 0644);
   if(fd < 0) return errno;
   close(fd);
@@ -217,16 +239,17 @@ static void *
 tile_thread(void *arg) {
   unsigned port = (unsigned)(uintptr_t)arg;
 
+  int renew = 0;
   if(registered()) {
     g_tile_port = port_in_param();
-    g_state = TILE_PRESENT;
-    if(g_tile_port && g_tile_port != port)
-      LOG("The home-screen tile opens port %u, the web UI now uses %u. Delete the tile on the PS5 and restart the payload to renew it.",
-          "Ana ekran kutucuğu %u portunu açıyor, web arayüzü artık %u kullanıyor. Yenilemek için kutucuğu PS5'te silip payload'ı yeniden başlatın.",
-          g_tile_port, port);
-    else
+    if(param_current(port)) {
+      g_state = TILE_PRESENT;
       LOG("Home-screen tile is there (%s).", "Ana ekran kutucuğu mevcut (%s).", TILE_ID);
-    return NULL;
+      return NULL;
+    }
+    renew = 1;
+    LOG("Home-screen tile is out of date (older version or another port); renewing it.",
+        "Ana ekran kutucuğu güncel değil (eski sürüm ya da başka port); yenileniyor.");
   }
 
   title_dir_fn install = find_title_dir();
@@ -257,7 +280,13 @@ tile_thread(void *arg) {
 
   rc = install(TILE_ID, TILE_APP_ROOT, NULL);
   g_code = (unsigned)rc;
-  if((unsigned)rc == INST_ALREADY) {
+  if(renew && (rc == 0 || (unsigned)rc == INST_ALREADY)) {
+    unlink(TILE_STAGING);
+    g_tile_port = port;
+    g_state = TILE_PRESENT;
+    LOG("Home-screen tile renewed (%s, 0x%08X); it opens http://127.0.0.1:%u.",
+        "Ana ekran kutucuğu yenilendi (%s, 0x%08X); http://127.0.0.1:%u adresini açar.", TILE_ID, (unsigned)rc, port);
+  } else if((unsigned)rc == INST_ALREADY) {
     /* Registered, just not where we looked: no notification. */
     unlink(TILE_STAGING);
     g_tile_port = port;
